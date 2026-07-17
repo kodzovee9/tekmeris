@@ -1,0 +1,217 @@
+\section{Disclosed construction rules}\label{app:rules}
+
+Table~\ref{tab:rules} reproduces the numbered rules under which our SAM
+departs from the benchmark's (unpublished or unrecorded) choices. Each rule
+is implemented in the replication package and printed in the generated
+workbook; ``measured consequence'' refers to the comparison against the
+benchmark reported in Section~\ref{sec:results}.
+
+\begin{table}[h]
+\centering\small
+\caption{Rules R1--R7: explicit substitutes for non-public or unrecorded choices.}
+\label{tab:rules}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+Rule & Construction & Replaces / measured consequence \\
+\midrule
+R1 & Import duties by commodity: total from the public series KBP4590J, allocated by import shares & Unpublished customs data; $+16.1$\% on import duties \\
+R2 & Other product taxes by commodity: supply-table tax column minus R1 & Same dependency; $-1.5$\% on product taxes \\
+R3 & Capital-type shares for six activities absent from the AFS: economy-wide average shares & Undocumented benchmark source for those sectors \\
+R4 & Household consumption pattern: each commodity split across groups by total-expenditure shares & Benchmark's inherited item-level shares; drives most residual household imbalance \\
+R5 & Occupation-to-household wages: aggregate LCS wage-income group shares for every occupation & Benchmark's education-based expansion \\
+R6 & Other household-facing cells: LCS wage-income group shares as income-side proxy & Benchmark's item-specific LCS systems \\
+R7 & Capital income to institutions uniform across the six capital types & The benchmark's own documented rule (adopted) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Evidentiary status of the audit findings}\label{app:evidence}
+
+Not every divergence between record and artefact has the same epistemic
+status, and the audit methodology requires saying which is which.
+Table~\ref{tab:evidence} classifies each South African finding by its
+detection mechanism and the strength of the resulting inference, on a
+five-level scale: \emph{exactly recovered} (the data admit one answer and
+it reproduces the benchmark); \emph{unique within tested grid} (one
+candidate among an enumerated finite set fits, with the runner-up margin
+reported); \emph{consistent with} (the pattern matches a hypothesised
+intervention that is not uniquely identified); \emph{documented} (the
+source record itself states the choice); and \emph{unresolved} (the
+inputs needed to decide are unavailable).
+
+\begin{table}[h]
+\centering\small
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+Finding & Detection mechanism & Evidentiary status \\
+\midrule
+\texttt{atx}, \texttt{cler}, \texttt{craf} misnamed & identity match on
+all 61 activities & exactly recovered \\
+\texttt{mach}/\texttt{nitc}/\texttt{trnp} rotation & dictionary
+cross-check against technical note & documented \\
+Formula signs (intra-enterprise cell) & exhaustive $3^6$ grid; runner-up
+misses by R2.5bn & unique within tested grid \\
+Capital-split vintage and measure & edition $\times$ measure grid
+(0.18pp vs 0.72pp) & unique within tested grid \\
+Household grouping variable & two dictionary-free anchors &
+unique within tested definitions \\
+R596m government--enterprise edit & balance-preserving minimal-edit
+pattern; vintage test refuted & consistent with \\
+Customs input (\texttt{mtx}/\texttt{stx}) & note's own statement;
+priced by public proxy & documented; unresolved input \\
+Six sectors' capital shares & absent from AFS source & unresolved \\
+Household consumption shares & technical-note statement & documented
+(inherited system) \\
+Posts/telecoms capital outlier & residual after recovered basis &
+consistent with (unreported reclassification) \\
+\bottomrule
+\end{tabularx}
+\caption{South African audit findings by detection mechanism and
+evidentiary status.}
+\label{tab:evidence}
+\end{table}
+
+\section{Balancing the generated Dutch matrix: rules, invariants, and
+sensitivity}\label{app:nlbalance}
+
+The balancing step of Section~\ref{sec:applications:nl} involves three
+choices, none mechanically inevitable; this note states each rule, the
+invariant it preserves, and the measured sensitivity to the one genuinely
+discretionary choice.
+
+\emph{Sign normalisation.} The generated matrix contains two negative
+cells: net property-type capital income vis-\`a-vis the rest of the world
+(EUR $-10{,}286$m at (row $\leftarrow$ capital)) and the D8 pension
+adjustment vis-\`a-vis the rest of the world (EUR $-168$m). Each is
+flipped to its positive transpose before balancing: a payment of $-v$
+from account $a$ to account $b$ is identically a payment of $+v$ from
+$b$ to $a$. The flip preserves, cell by cell, every account's
+receipts-minus-payments residual and every institution's net position;
+it changes only the gross flows' side of the ledger, and both flips have
+the natural economic reading (the Netherlands is a net \emph{recipient}
+of capital income from abroad). RAS requires a non-negative seed, so the
+alternative would be GRAS; normalisation is preferred because it makes
+the negativity explicit and reviewable rather than absorbing it into a
+generalised algorithm.
+
+\emph{Target vector.} RAS needs one target per account. The generated
+matrix supplies two candidates---each account's receipts and its
+payments, which differ by exactly the attributed residual---and the rule
+takes their arithmetic mean: the symmetric choice that favours neither
+side of any account and whose row- and column-target totals agree by
+construction. The two one-sided choices (all-receipts, all-payments) are
+the extreme brackets of this decision.
+
+\emph{Sensitivity.} Rebalancing against each extreme bracket (scaled to
+a common total so variants are comparable cell by cell) moves no cell of
+the balanced matrix by more than EUR~6.4~billion---0.9\,per\,cent of
+GDP, the same order as the pre-balancing residuals themselves---and no
+cell above EUR~100m by more than 6.6\,per\,cent of its value. That is
+the expected behaviour: the target choice redistributes the attributed
+residuals between the two sides of each unbalanced account; it does not
+amplify them, and the mean-target SAM lies between the brackets.
+Sensitivity is regenerated by the replication package alongside the
+matrix.
+
+\emph{Choice of RAS.} After normalisation the seed is non-negative, so
+GRAS is unnecessary rather than rejected. RAS is preferred to
+cross-entropy estimation here because its per-cell multiplicative
+factors are individually interpretable and are published with the
+matrix---the framework's logging commitment---while cross-entropy with
+uninformative priors would deliver essentially the same adjustment with
+less transparent diagnostics \citep{robinson2001}.
+
+\section{Transfer validation across additional ESA publication regimes}
+\label{app:transfer}
+
+After the Dutch case was complete, the packaged generator
+(\texttt{toolkit/recipes/build/} in the replication package) was rerun,
+unchanged, on two further countries chosen to bracket the harmonised
+system's publication practice; validation reports for both ship with the
+replication package.
+
+\emph{Austria 2019} behaves like the Netherlands: 65 industries and
+products, zero identity findings at the EUR~1m tolerance, full commodity
+closure, and every pre-balancing account residual below 0.6\,per\,cent
+of GDP.
+
+\emph{Poland 2019} exposed a publication-practice boundary \emph{inside}
+the harmonised system: Polish tables withhold confidential cells, so the
+published industry-and-product detail covers only 96.7\,per\,cent of
+gross output (government final consumption detail: 92.6\,per\,cent). The
+toolkit detects the suppression through its tiling and coverage
+assertions, anchors the macro accounts to the published totals---which
+remain complete and internally consistent---and reports the coverage of
+every affected aggregate; the generated Polish matrix closes with
+residuals below 1.1\,per\,cent of GDP. Even within the ESA transmission
+programme, then, the replicability spectrum persists at the cell level:
+harmonisation fixes the format, not the disclosure.
+
+\section{The toolkit and replication package: a reader's guide}
+\label{app:toolkit}
+
+The toolkit (\texttt{edikit}, Apache-2.0) is a small Python library in
+four modules---\texttt{data} (readers for supply--use workbooks, SAM
+matrices, central-bank series, Eurostat JSON-stat, and concordances, each
+enforcing its source's accounting identities on ingestion),
+\texttt{model} (the account taxonomy with coverage assertions; RAS
+balancing with mandatory per-cell factor diagnostics), \texttt{report}
+(generation of workbooks whose totals and balance checks are live
+formulas), and \texttt{pipeline} (end-to-end generation and audit
+routines)---plus a test suite in which the accounting identities are the
+test cases. Users enter through three documented \emph{recipes},
+matching the publication regimes of this paper: \texttt{replicate/}
+(regenerate every number here), \texttt{audit/} (audit a published SAM:
+structure, then macro controls against published national accounts), and
+\texttt{build/} (generate and balance a macro SAM for any
+ESA-transmitting country). The latter two are each one command, e.g.:
+
+{\small
+\begin{verbatim}
+python build_sam.py --country AT --year 2019
+python audit_sam.py --sam <matrix.csv> --kinds <kinds.csv> \
+                    --controls <controls.csv>
+\end{verbatim}}
+
+\noindent Step-by-step instructions live in the package's README files,
+which can evolve with the code; this appendix instead gives the map a
+verifying reader needs: which script produces each of the paper's
+claims, and which validation report records it
+(Table~\ref{tab:claimmap}). Every script writes its report to
+\texttt{outputs/}; the reports, not the console, are the record.
+
+\begin{table}[h]
+\centering\small
+\begin{tabularx}{\textwidth}{Xll}
+\toprule
+Claim & Script(s) & Validation report \\
+\midrule
+SUT identities pass; production and commodity blocks exact
+  & 01--03 & \texttt{supply\_/use\_validation} \\
+Institutional macro cells from SARB formulas; grid-recovered signs;
+  priced customs proxy & 04--06 & \texttt{macro\_sam\_construction} \\
+Capital split: vintage/measure recovery grid & 07 &
+  \texttt{capital\_split} \\
+Occupation shares from LMD wage bills & 08 & \texttt{occupation\_split} \\
+Household grouping identification & 09 & \texttt{household\_split} \\
+Full assembly under rules R1--R7; comparable-cell counts & 10 &
+  \texttt{assembly\_report} \\
+RAS balancing, factors logged; workbook & 11--12 &
+  \texttt{balance\_report}; workbook \\
+Paper exhibits regenerate from outputs & 13 & \texttt{paper/tables},
+  \texttt{figures} \\
+Kenya: structure, rounding grain, KNBS macro controls & 14 &
+  \texttt{kenya\_structural\_audit} \\
+Netherlands: generation, residual attribution, balancing and its
+  sensitivity (Appendix~\ref{app:nlbalance}) & 15 &
+  \texttt{netherlands\_generation} \\
+Austria/Poland transfer validation (Appendix~\ref{app:transfer}) &
+  build recipe & \texttt{\{AT,PL\}\_2019\_generation} \\
+\bottomrule
+\end{tabularx}
+\caption{Map from the paper's claims to the scripts that produce them
+and the validation reports that record them. Scripts 01--12 need only
+the registered sources; 08--09 additionally require the DataFirst
+microdata (Section~\ref{sec:data}).}
+\label{tab:claimmap}
+\end{table}

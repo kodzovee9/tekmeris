@@ -1,0 +1,10 @@
+# SAM v0.2 balancing report
+
+Generated 2026-07-16 by code/11_balance_sam.py.
+
+- Household income block: 266 cells, 14 groups x 19 payers; aggregate income/outlay gap before balancing: +0.0000% (row targets scaled accordingly)
+- RAS: converged in 1 iterations; max residual gap R0.000000m
+- Household imbalance: max R99,987m before -> R0.063m after
+- Largest remaining imbalance outside households: R7m
+- Adjustment factors: median 1.045, range [0.907, 1.143]
+- Mean |cell difference| vs benchmark household block: R10,779.3m before -> R10,690.1m after (toward the benchmark)

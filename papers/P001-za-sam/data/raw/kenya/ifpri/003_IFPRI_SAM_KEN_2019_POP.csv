@@ -1,0 +1,19 @@
+﻿Representative Household Populations,Code,Number (1000s of people),Share
+All households,h_ALL,"52,574",100.0
+Quintile 1,h_Q1,"10,516",20.0
+Quintile 2,h_Q2,"10,514",20.0
+Quintile 3,h_Q3,"10,515",20.0
+Quintile 4,h_Q4,"10,514",20.0
+Quintile 5,h_Q5,"10,514",20.0
+Rural households,h_RUR,"33,751",64.2
+Rural quintile 1,h_rur1,"9,266",17.6
+Rural quintile 2,h_rur2,"8,468",16.1
+Rural quintile 3,h_rur3,"7,515",14.3
+Rural quintile 4,h_rur4,"5,776",11.0
+Rural quintile 5,h_rur5,"2,725",5.2
+Urban households,h_URB,"18,823",35.8
+Urban quintile 1,h_urb1,"1,250",2.4
+Urban quintile 2,h_urb2,"2,046",3.9
+Urban quintile 3,h_urb3,"3,000",5.7
+Urban quintile 4,h_urb4,"4,738",9.0
+Urban quintile 5,h_urb5,"7,789",14.8

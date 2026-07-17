@@ -1,0 +1,125 @@
+source,target,target_label
+I1,aagri,Agriculture
+I2,afore,Forestry
+I3,afish,Fishing
+I4,acoal,Mining of coal and lignite
+I5,aomin,Other mining and quarrying
+I6,agold,Mining of gold and uranium ore
+I7,amore,Mining of metal ores
+I8,aomin,Other mining and quarrying
+I9,aomin,Other mining and quarrying
+I10,afood,Food
+I11,afood,Food
+I12,afood,Food
+I13,afood,Food
+I14,abevt,Beverages and tobacco
+I15,abevt,Beverages and tobacco
+I16,aweav,"Spinning, weaving and finishing of textiles"
+I17,aweav,"Spinning, weaving and finishing of textiles"
+I18,aknit,"Knitted, crouched fabrics, wearing apparel, fur articles"
+I19,aknit,"Knitted, crouched fabrics, wearing apparel, fur articles"
+I20,aleat,Tanning and dressing of leather
+I21,afoot,Footwear
+I22,awood,"Sawmilling, planing of wood, cork, straw"
+I23,awood,"Sawmilling, planing of wood, cork, straw"
+I24,apapr,Paper
+I25,aprnt,"Publishing, printing, recorded media"
+I26,aprnt,"Publishing, printing, recorded media"
+I27,apetr,"Coke oven, petroleum refineries"
+I28,apetr,"Coke oven, petroleum refineries"
+I29,abchm,"Nuclear fuel, basic chemicals"
+I30,aochm,"Other chemical products, man-made fibres"
+I31,arubb,Rubber
+I32,aplas,Plastic
+I33,aglss,Glass
+I34,anmmi,Non-metallic minerals
+I35,amets,"Metal products (ferr, non-ferr & casting of metals)"
+I36,amets,"Metal products (ferr, non-ferr & casting of metals)"
+I37,amets,"Metal products (ferr, non-ferr & casting of metals)"
+I38,afabm,Fabricated metal products
+I39,afabm,Fabricated metal products
+I40,amach,Machinery and equipment
+I41,amach,Machinery and equipment
+I42,aemch,Electrical machinery and apparatus
+I43,aemch,Electrical machinery and apparatus
+I44,aemch,Electrical machinery and apparatus
+I45,aemch,Electrical machinery and apparatus
+I46,ardtv,"Radio, television, communication equipment and apparatus"
+I47,ardtv,"Radio, television, communication equipment and apparatus"
+I48,amopt,"Medical, precision, optical instruments, watches and clocks"
+I49,amtvp,"Motor vehicles, trailers, parts"
+I50,amtvp,"Motor vehicles, trailers, parts"
+I51,amtvp,"Motor vehicles, trailers, parts"
+I52,aotrp,Other transport equipment
+I53,aotrp,Other transport equipment
+I54,aotrp,Other transport equipment
+I55,aotrp,Other transport equipment
+I56,afurn,Furniture
+I57,aomnf,"Manufacturing n.e.c, recycling"
+I58,aomnf,"Manufacturing n.e.c, recycling"
+I59,aelcg,"Electricity, gas, steam and hot water supply"
+I60,awatd,"Collection, purification and distribution of water"
+I61,acnst,Construction
+I62,acnst,Construction
+I63,acnst,Construction
+I64,acnst,Construction
+I65,acnst,Construction
+I66,awtrd,"Wholesale trade, commission trade"
+I67,awtrd,"Wholesale trade, commission trade"
+I68,awtrd,"Wholesale trade, commission trade"
+I69,awtrd,"Wholesale trade, commission trade"
+I70,awtrd,"Wholesale trade, commission trade"
+I71,awtrd,"Wholesale trade, commission trade"
+I72,artrd,Retail trade
+I73,artrd,Retail trade
+I74,artrd,Retail trade
+I75,artrd,Retail trade
+I76,artrd,Retail trade
+I77,amtvs,"Sale, maintenance, repair of motor vehicles"
+I78,amtvs,"Sale, maintenance, repair of motor vehicles"
+I79,amtvs,"Sale, maintenance, repair of motor vehicles"
+I80,amtvs,"Sale, maintenance, repair of motor vehicles"
+I81,aacct,Hotels and restaurants
+I82,aacct,Hotels and restaurants
+I83,altrp,"Land transport, transport via pipe lines"
+I84,altrp,"Land transport, transport via pipe lines"
+I85,awtrp,Water transport
+I86,aatrp,Air transport
+I87,atrps,Auxiliary transport
+I88,apost,Post and telecommunication
+I89,apost,Post and telecommunication
+I90,afins,Financial intermediation
+I91,afins,Financial intermediation
+I92,ainsp,Insurance and pension funding
+I93,aofin,Activities to financial intermediation
+I94,ainsp,Insurance and pension funding
+I95,areal,Real estate activities
+I96,areal,Real estate activities
+I97,areal,Real estate activities
+I98,arent,Renting of machinery and equipment
+I99,arent,Renting of machinery and equipment
+I100,arent,Renting of machinery and equipment
+I101,acomp,Computer and related activities
+I102,acomp,Computer and related activities
+I103,acomp,Computer and related activities
+I104,acomp,Computer and related activities
+I105,arsea,Research and experimental development
+I106,aobus,Other business activities
+I107,aobus,Other business activities
+I108,aobus,Other business activities
+I109,aobus,Other business activities
+I110,apuba,Government
+I111,apuba,Government
+I112,apuba,Government
+I113,aeduc,Education
+I114,aheal,Health and social work
+I115,aheal,Health and social work
+I116,aheal,Health and social work
+I117,awast,Sewerage and refuse disposal
+I118,amorg,Activities of membership organisations
+I119,amorg,Activities of membership organisations
+I120,arecr,"Recreational, cultural and sporting activities"
+I121,arecr,"Recreational, cultural and sporting activities"
+I122,arecr,"Recreational, cultural and sporting activities"
+I123,aoact,Other activities
+I124,anobs,"Non-observed, informal, non-profit, households,"

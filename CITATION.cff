@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software or the results, please cite as below."
+title: "Tekmeris: reproducible construction and auditing of social accounting matrices (edikit)"
+type: software
+authors:
+  - family-names: Abalo
+    given-names: Kodzovi
+version: 0.1.0
+date-released: 2026-07-17
+license: Apache-2.0
+repository-code: "https://github.com/kodzovee9/tekmeris"
+preferred-citation:
+  type: unpublished
+  authors:
+    - family-names: Abalo
+      given-names: Kodzovi
+  title: "From Supply and Use Tables to Reproducible Social Accounting Matrices: A Transparent Construction and Audit Framework"
+  year: 2026
+  notes: "Working paper"

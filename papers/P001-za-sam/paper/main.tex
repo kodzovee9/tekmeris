@@ -1,0 +1,83 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{natbib}
+\usepackage{setspace}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\onehalfspacing
+
+\title{From Supply and Use Tables to Reproducible Social Accounting
+Matrices:\\ A Transparent Construction and Audit Framework\\
+\large Evidence from three publication regimes: South Africa, Kenya,
+and the Netherlands --- working paper, draft v0.5}
+\author{Kodzovi Abalo\thanks{World Bank. The views expressed here are those
+of the author and do not necessarily reflect the views of the World Bank,
+its Executive Directors, or the governments they represent. Comments
+welcome.}}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Social accounting matrices (SAMs) underpin much applied policy modelling,
+yet the way they are built has a reproducibility problem: heterogeneous
+official tables are reconciled through undocumented spreadsheet operations
+and expert judgments that cannot be audited, updated, or transferred. This
+paper demonstrates that the problem is unnecessary---that SAM construction
+can move from an artisanal exercise to an auditable statistical-production
+process. We introduce a construction and audit framework in which every
+source is fingerprinted, every classification and formula is
+machine-readable, every balancing adjustment is logged at the cell where
+it acts, and accounting identities are enforced as executable checks. We
+apply it to build a complete 2019 SAM for South Africa from publicly
+obtainable official sources and access-controlled survey microdata,
+audited cell by cell against the published UNU-WIDER benchmark of
+\citet{vanseventer2023}: the benchmark's production, commodity, and
+institutional macro structure is reproduced exactly up to one unpublished
+input, which is separately identified and priced ($+16.1$ per cent on
+import duties under its public proxy). Where the benchmark's choices are
+undocumented, the framework recovers them numerically; every reported
+discrepancy was first detected by deterministic reconciliation and then
+interpreted against the source record. Two further, deliberately
+shallower applications test the framework at the ends of the public-data
+spectrum: in Kenya, auditing proceeds exactly as far as the boundary set
+by publication format; in the Netherlands, the framework generates and
+balances a macro SAM from three Eurostat API calls with no benchmark
+consulted. The open toolkit that implements the framework is offered as
+reproducible infrastructure, and the central proposal follows: cell-level
+provenance and machine-readable construction rules, published alongside
+every SAM, would make such audits---and such SAMs---routine.
+\end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} social accounting matrix, supply and use tables,
+reproducibility, data provenance, statistical auditing, South Africa,
+Kenya, Netherlands.\\
+\textbf{JEL:} C67, C82, D57, E16, O55.
+
+\input{sections/introduction}
+\input{sections/related}
+\input{sections/data}
+\input{sections/method}
+\input{sections/results}
+\input{sections/applications}
+\input{sections/discussion}
+\input{sections/conclusion}
+\input{sections/disclosure}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "edikit"
+version = "0.0.1"
+description = "Toolkit for reproducible, AI-assisted policy analysis (working name)"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+dependencies = [
+    "openpyxl",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/edikit"]

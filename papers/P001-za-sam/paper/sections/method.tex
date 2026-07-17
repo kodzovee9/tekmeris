@@ -1,0 +1,158 @@
+\section{Method}\label{sec:method}
+
+\subsection{Terms and architecture}\label{sec:method:terms}
+
+Six related terms recur and are not interchangeable; we fix them here.
+\emph{Reproducibility}: rerunning the released code on the registered
+inputs yields the released artefact, to a stated tolerance.
+\emph{Replication}: independently rebuilding an artefact from its stated
+sources and methods; \emph{reconstruction} is our implementation of it,
+assembling a new SAM from primary sources under disclosed rules.
+\emph{Auditability}: the property that each discrepancy between an
+artefact and its record can be traced, bounded, or explicitly classified
+rather than left latent (Appendix~\ref{app:evidence} classifies this
+paper's findings on exactly that scale). \emph{Provenance}: the
+recorded lineage from each cell back to its source series,
+transformations, and adjustments. \emph{Deterministic reconciliation}:
+detecting divergence by arithmetic---an identity that fails to close, a
+grid search with a unique survivor---rather than by reading
+documentation. Unless stated otherwise, ``exact'' in this paper means
+agreement within R0.5~million, the rounding grain of the benchmark's
+distributed workbook; where a comparison is made at a source's own
+reported precision (the SARB vintage check of Section~\ref{sec:data}), we
+say so explicitly.
+
+Figure~\ref{fig:pipeline} shows the framework's architecture: eight
+stages from registered sources to reproducible artefacts, with the four
+commitments of Section~\ref{sec:intro} enforced at the stages where they
+bind. The same stages serve construction and audit---auditing is
+construction plus a comparison target.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  stage/.style={draw, rounded corners=2pt, align=center, font=\small,
+                minimum height=2.2em, inner sep=5pt, fill=gray!8},
+  note/.style={font=\scriptsize\itshape, text=gray!60!black, align=center},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[stage] (s1) {Registered\\sources};
+\node[stage, right=0.55cm of s1] (s2) {Verified\\ingestion};
+\node[stage, right=0.55cm of s2] (s3) {Explicit\\classification};
+\node[stage, right=0.55cm of s3] (s4) {Formula \&\\concordance layer};
+\node[stage, below=0.9cm of s4] (s5) {Assembly under\\numbered rules};
+\node[stage, left=0.55cm of s5] (s6) {Diagnostic\\reconciliation};
+\node[stage, left=0.55cm of s6] (s7) {Logged\\balancing};
+\node[stage, left=0.55cm of s7] (s8) {Reproducible\\artefacts};
+\draw[arr] (s1) -- (s2); \draw[arr] (s2) -- (s3);
+\draw[arr] (s3) -- (s4); \draw[arr] (s4) -- (s5);
+\draw[arr] (s5) -- (s6); \draw[arr] (s6) -- (s7); \draw[arr] (s7) -- (s8);
+\node[note, above=0.12cm of s1] {vintage, hash,\\licence};
+\node[note, above=0.12cm of s2] {identities as\\executable checks};
+\node[note, above=0.12cm of s3] {coverage\\assertions};
+\node[note, below=0.12cm of s6] {vs.\ identities and,\\if any, a benchmark};
+\node[note, below=0.12cm of s7] {every factor\\published};
+\node[note, below=0.12cm of s8] {matrix, reports,\\live workbook};
+\end{tikzpicture}%
+}
+\caption{The framework's eight stages. Auditing and construction share
+the pipeline; an audit adds a comparison target at the reconciliation
+stage.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Pipeline}
+
+The South African pipeline is twelve construction and audit scripts
+(01--12) over the open toolkit; a thirteenth generates the paper's
+exhibits, and scripts 14--15 implement the Kenyan and Dutch applications
+of Section~\ref{sec:applications}. The design principle is that
+\emph{nothing is classified by convention}. Account codes, prose
+descriptions, and header labels are treated as claims to be verified,
+never as facts. Concretely:
+
+\begin{enumerate}
+  \item \textbf{Ingestion with internal checks.} Readers for the supply and
+  use tables recompute every embedded total and verify the layout's
+  accounting identities: for each product, supply at purchasers' prices
+  must equal supply at basic prices plus product taxes plus trade and
+  transport margins; for each industry, output must equal intermediate
+  inputs plus value added; and value added must equal the sum of its
+  components---compensation of employees, other net taxes on production,
+  and gross operating surplus or mixed income (coded $D1$, $D2/3$, and
+  $B2/3$ in the published tables, summing to value added
+  $B1$).\footnote{These are the SNA transaction codes used by Stats~SA's
+  published tables: $B1$ gross value added, $D1$ compensation of
+  employees, $D2/3$ other taxes less subsidies on production, $B2/3$ gross
+  operating surplus / mixed income \citep{un2009sna}.} The official 2019
+  tables pass all checks at a R0.5~million tolerance.
+  \item \textbf{Explicit classification.} The 209 benchmark accounts are
+  mapped to a canonical taxonomy (activity, commodity, factor, household,
+  \ldots) in one reviewable table extracted from the workbook's own
+  dictionary sheets; a coverage assertion guarantees that every account in
+  the matrix is classified and nothing phantom is. Classification by prefix
+  is refused by construction---for good reason, as the results show.
+  \item \textbf{Concordances as data.} The 124$\to$61 industry and
+  product mappings, the labour-survey industry table, and the asset and
+  industry tables of the financial-statistics source are parsed from the
+  benchmark's published materials into CSV concordances with completeness
+  validation (every source category maps exactly once).
+  \item \textbf{Institutional cells as formulas.} The technical note
+  defines each macro cell in prose as a combination of SARB Quarterly
+  Bulletin series. We transcribe all 46 definitions into a machine-readable
+  formula table---one row per cell, holding the signed combination of
+  series codes---which a small evaluator computes
+  mechanically.\footnote{For example, the cell (households $\leftarrow$
+  labour) is the single series KBP6240J, ``compensation of residents'';
+  the cell (government $\leftarrow$ production taxes) is KBP6600J
+  $-$ KBP6601J. Two rest-of-world cells that the note itself defines as
+  residuals of other entries are stored as such and resolved recursively,
+  e.g.\ (rest of world $\leftarrow$ labour) $=$ (labour income) $+$
+  (labour from abroad) $-$ (labour to households).} The one unpublished
+  input enters this table as a flagged parameter evaluated under two
+  scenarios: \emph{as built} (the benchmark's value) and \emph{public
+  proxy} (the closest published series), so that its effect is measured
+  rather than absorbed.
+  \item \textbf{Share systems from microdata.} Capital-type shares from the
+  AFS PPE schedules; occupational wage-bill shares from LMD 2018--2019
+  (weighted employment $\times$ average wage, national occupation wage for
+  empty cells, two-year averaging); household groups as weighted
+  expenditure deciles with the top decile in five 2\,per\,cent bands from
+  the LCS.
+  \item \textbf{Assembly under numbered rules.} The full 209-account SAM is
+  assembled from the above; every point where the benchmark's choice is
+  unpublished or undocumented is replaced by an explicit rule, numbered
+  R1--R7 and reproduced in Appendix~\ref{app:rules},\footnote{The rules
+  also ship as part of the replication package and are printed on a
+  dedicated sheet of the generated workbook.} so that the difference
+  between our SAM and the benchmark is, by construction, the union of
+  disclosed rules.
+  \item \textbf{Balancing with a log.} Residual imbalances---confined to
+  the household income block---are closed by RAS with fixed payer totals
+  and group outlay targets; the implementation refuses negative seeds,
+  reports convergence, and returns the multiplicative factor of every
+  adjusted cell, which is published in the workbook.
+\end{enumerate}
+
+\subsection{Audit method: reconciliation and recovery}
+
+The audit compares each constructed block with the benchmark at the finest
+common level and treats any discrepancy as a diagnostic object. Three
+patterns recur. \emph{Identity-guided attribution}: a mismatch is traced by
+asking which accounting identity it violates and what movement would repair
+it (this is how mislabelled accounts and valuation mismatches announce
+themselves). \emph{Grid recovery}: when documentation is silent over a
+small discrete choice set---which source edition, which measurement column,
+which signs---we evaluate all candidates against the benchmark and accept a
+choice only if it is uniquely best, reporting the
+margin.\footnote{Two instances matter below. For one aggregation formula,
+the six quoted series were each allowed a coefficient of $-1$, $0$, or
+$+1$; of the $3^6 = 729$ combinations, exactly one reproduces the
+benchmark, and the runner-up misses by R2.5~billion. For the capital-stock
+split, the grid crossed the source's two published editions (2019
+preliminary versus 2019 revised) with two candidate stock measures
+(opening versus closing carrying value); ``recovering the vintage and
+measure'' means identifying which edition--measure pair the benchmark
+used.} \emph{Scenario pricing}: where an input is genuinely non-public, we
+quantify the cost of its best public substitute rather than absorb it
+silently.

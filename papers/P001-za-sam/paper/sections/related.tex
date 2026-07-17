@@ -1,0 +1,84 @@
+\section{Background: the practice and its reproducibility problem}
+\label{sec:related}
+
+\subsection{Related work}
+
+The SAM as an integrated accounting framework descends from
+\citet{stone1962} and was consolidated as a planning tool by
+\citet{pyattthorbecke1976} and \citet{pyattround1985}. The mechanics of
+reconciling inconsistent accounts are equally mature: biproportional (RAS)
+adjustment and its generalisations \citep{temurshoev2013}, and the
+cross-entropy estimation of \citet{robinson2001}, which remains the
+standard reference for SAM balancing under scattered and unequally reliable
+information. Compilation practice for the supply--use core is codified in
+the SNA and its handbooks \citep{un2009sna,un2018handbook,eurostat2008};
+the analytics that consume SAMs are surveyed by \citet{millerblair2009}
+and, for CGE databases, \citet{lofgren2002}. Operationally, most African
+country SAMs are produced within a small number of institutional
+pipelines---notably IFPRI's country programmes \citep{thurlow2021} and
+UNU-WIDER's South Africa series---of which the benchmark used here
+\citep{vanseventer2023} is a leading example.
+
+The paper's infrastructure claims sit at the junction of several
+adjacent literatures, each of which has solved a piece of the problem.
+Large international input--output databases are compiled under documented,
+code-driven procedures---WIOD \citep{timmer2015}, EXIOBASE
+\citep{stadler2018}, and Eurostat's FIGARO tables \citep{remond2019}---and
+open-source tooling such as \texttt{pymrio} \citep{stadler2021} has made
+their \emph{consumption} programmatic; but these systems document
+methodology at the level of reports, not cell-level provenance, and none
+is designed to let an outsider audit a single published matrix against
+its own record. Machine-readable statistical standards (SDMX for
+dissemination \citep{sdmx2021}; the W3C PROV model for data lineage
+\citep{w3cprov2013}) supply exactly the vocabulary our standards proposal
+needs, but have not been applied to SAM construction. And the norms of
+reproducible computational research---\citet{peng2011},
+\citet{sandve2013}, and for economics practice
+\citet{gentzkow2014}---prescribe the workflow discipline the framework
+implements, without the accounting-identity instrument that makes SAM
+auditing unusually sharp. Within economics the paper joins the
+transparency and replication agenda \citep{christensen2018}, with that
+accounting twist: a SAM's identities give the auditor a powerful
+instrument, because any undocumented intervention must either break an
+identity or leave a biproportional fingerprint. To our knowledge, no
+existing system combines registered sources, executable identities,
+cell-level provenance, and logged balancing for national SAM
+construction---which is why, as Section~\ref{sec:related:workflow}
+argues, a full cell-level replication audit of a published national SAM
+appears not to have been undertaken before.
+
+\subsection{Why current workflows resist reproduction}
+\label{sec:related:workflow}
+
+The prevailing construction workflow---official tables copied into
+spreadsheets, reconciled by hand, described afterwards in prose---fails
+five requirements at once, none of them because practitioners are careless
+(Table~\ref{tab:workflow}). \emph{Transparency}: judgments act on
+individual cells but are reported, if at all, at the level of methods
+paragraphs. \emph{Versioning}: a spreadsheet's history is its author's
+memory; source vintages and revisions are rarely pinned.
+\emph{Provenance}: a finished cell does not say which source, which
+transformation, and which manual edit produced it. \emph{Auditability}: a
+reader can check that the matrix balances, but not why any cell holds its
+value. \emph{Reproducibility}: rebuilding the matrix from its stated
+sources is a research project, not a command---as this paper demonstrates
+by undertaking exactly that project. To our knowledge it is the first
+full cell-level replication audit of a published national SAM from primary
+sources; that such an audit is novel is itself evidence of the problem.
+
+\begin{table}[t]
+\centering\small
+\caption{Prevailing SAM construction workflow versus the framework used here.}
+\label{tab:workflow}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+Requirement & Prevailing practice & This framework \\
+\midrule
+Transparency & Judgments described in prose, if at all & Classifications, formulas, and rules are machine-readable files \\
+Versioning & Source vintages implicit; spreadsheet history unrecorded & Every input registered with vintage, access date, SHA-256 hash \\
+Provenance & Finished cells carry no origin & Cells trace to source series, transformation, and logged adjustment \\
+Auditability & Balance checkable; cell values not & Identities enforced as executable checks; adjustment log published \\
+Reproducibility & Rebuild is a research project & Rebuild is a command (scripts 01--12 of the replication package) \\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,45 @@
+# Use-side validation report
+
+Generated 2026-07-16 by code/03_validate_use_side.py.
+
+## Internal consistency of the official use table (S-001)
+
+- Products: 108; industries: 124; final-demand categories: Exports, Households, General government, Fixed capital formation, Changes in inventories, Residual
+- Identity checks (supply = intermediate + final demand; output = intermediate + B1; B1 = D1 + D2/3 + B2/3; embedded totals): **0 findings** at R0.5m tolerance
+- Cross-table checks vs supply table: **0 findings**
+
+## SUT vs benchmark SAM, per activity (61 accounts)
+
+SAM activity columns are decomposed as intermediates (c* rows, excluding the mislabeled occupation accounts cler/craf) + production taxes (atx) + factor payments; implied VA = column total - intermediates - atx.
+
+- Intermediate consumption: within 1%: 61/61; median |dev| 0.0000%; max |dev| 0.0000%
+- Value added: within 1%: 61/61; median |dev| 0.0000%; max |dev| 0.0000%
+- Production taxes routed through 'atx': R106,420m total
+
+### Largest intermediate-consumption deviations
+
+| Account | Label | SUT (Rm) | SAM (Rm) | Dev % |
+|---|---|---|---|---|
+| abchm | Nuclear fuel, basic chemicals | 85,716 | 85,716 | +0.0000 |
+| aweav | Spinning, weaving and finishing  | 17,477 | 17,477 | +0.0000 |
+| aelcg | Electricity, gas, steam and hot  | 160,604 | 160,604 | +0.0000 |
+| amtvp | Motor vehicles, trailers, parts | 242,751 | 242,751 | -0.0000 |
+| aeduc | Education | 81,664 | 81,664 | -0.0000 |
+| aprnt | Publishing, printing, recorded m | 41,853 | 41,853 | +0.0000 |
+| amorg | Activities of membership organis | 10,661 | 10,661 | +0.0000 |
+| anmmi | Non-metallic minerals | 44,127 | 44,127 | -0.0000 |
+
+### Largest value-added deviations
+
+| Account | Label | SUT VA at factor cost (Rm) | SAM implied VA (Rm) | Dev % |
+|---|---|---|---|---|
+| ardtv | Radio, television, communication | 253 | 253 | -0.0000 |
+| abchm | Nuclear fuel, basic chemicals | 21,203 | 21,203 | -0.0000 |
+| amtvp | Motor vehicles, trailers, parts | 49,025 | 49,025 | +0.0000 |
+| aleat | Tanning and dressing of leather | 1,671 | 1,671 | +0.0000 |
+| afore | Forestry | 1,779 | 1,779 | -0.0000 |
+| aomnf | Manufacturing n.e.c, recycling | 12,222 | 12,222 | -0.0000 |
+| aknit | Knitted, crouched fabrics, weari | 12,627 | 12,627 | -0.0000 |
+| aweav | Spinning, weaving and finishing  | 10,312 | 10,312 | +0.0000 |
+
+Full table: use_validation.csv.

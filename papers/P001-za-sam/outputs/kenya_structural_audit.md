@@ -1,0 +1,25 @@
+# Kenya (second application): structural audit
+
+Generated 2026-07-17 by code/14_kenya_audit.py from the IFPRI 2019 Nexus SAM (S-008, CC-BY-4.0).
+
+- Accounts: 108; nonzero cells: 1,347; units Sh billions
+- Account groups (from the file's own labels): Activities (42); Commodities (42); Transaction costs (1); Factors (5); Enterprises (1); Households (10); Government (1); Taxes (3); Savings-investment (1); Change in stocks (1); Rest of world (1)
+- Balance: max |rowsum - colsum| = Sh 5.0000 billion (aheal); accounts within 0.5: 33/108
+
+## Macro comparison against KNBS controls (Sh billion, current prices, 2019 provisional)
+
+| Aggregate | SAM | KNBS (ES 2020) | Dev. % |
+|---|---|---|---|
+| GVA (all activities) | 8,825.0 | 8,911.5 | -1.0 |
+| Taxes on products | 821.0 | 828.9 | -1.0 |
+| GDP at market prices | 9,646.0 | 9,740.4 | -1.0 |
+| Private consumption (incl. NPISH) | 7,295.0 | 8,035.4 | -9.2 |
+| Government consumption | 1,387.0 | 1,271.4 | +9.1 |
+| Gross fixed capital formation | 1,631.0 | 1,631.9 | -0.1 |
+| Changes in inventories | 63.0 | 63.1 | -0.2 |
+| Exports of goods and services | 1,331.0 | 1,171.9 | +13.6 |
+| Imports of goods and services | 2,071.0 | 2,081.5 | -0.5 |
+| Statistical discrepancy | 0.0 | -351.9 | - |
+
+- SAM expenditure-side GDP = 9,636.0, equal to the production-side figure up to the file's integer rounding: a balanced SAM cannot carry KNBS's published Sh 352bn production-vs-expenditure discrepancy (-3.6% of GDP), so the cross-entropy reconciliation necessarily reallocated it. The pattern is consistent with the discrepancy and associated source differences being absorbed primarily through the consumption and trade aggregates; aggregate data cannot identify the allocation uniquely.
+- The uniform -1.0% on GVA, product taxes, and GDP is consistent with the SAM using a different vintage of the then-provisional 2019 accounts than the ES 2020 print.

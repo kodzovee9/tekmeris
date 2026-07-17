@@ -1,0 +1,28 @@
+\section*{Reproducibility and AI disclosure}\label{sec:disclosure}
+\addcontentsline{toc}{section}{Reproducibility and AI disclosure}
+
+The replication package comprises fifteen scripts over an open toolkit
+(\texttt{edikit}, released under the Apache-2.0 licence)---the South
+African construction and audit pipeline, the exhibit generator, and the
+Kenyan and Dutch applications---plus a source registry with SHA-256 hashes
+for every input, derived concordances and formula tables, per-script
+validation reports, and a workbook whose totals and balance checks are
+live formulas. All results in this paper regenerate from
+the registered sources. Survey microdata are used under DataFirst access
+conditions and are not redistributed---only aggregated shares appear in any
+output. The package is openly available at the repository accompanying
+this paper; Appendix~\ref{app:toolkit} maps each of the paper's claims
+to the script that produces it and the validation report that records
+it.
+
+Consistent with the framework's aim of demonstrating AI-assisted SAM
+construction under governance, the toolkit and the computations reported
+here were prepared with extensive use of a large language model
+(Anthropic's Claude) for code generation, document parsing, and
+diagnosis, operating under the project's governance rule: AI proposes;
+deterministic checks verify; the author approves. No AI-generated number
+enters any result without passing the pipeline's accounting identities and
+coverage assertions, and the paper reports one instance
+(Section~\ref{sec:results:shares}) where those assertions caught an
+AI-introduced error---which we regard as the governance working as
+designed.

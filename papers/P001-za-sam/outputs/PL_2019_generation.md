@@ -1,0 +1,64 @@
+# PL 2019: benchmark-free macro-SAM generation
+
+Generated 2026-07-17 by edikit.pipeline.eurostat_sam from the Eurostat dissemination API; no benchmark consulted.
+
+## Internal validation of the Eurostat SUT
+
+- Industries: 60; products: 60
+- Output and VA identities: 58 findings at EUR 1m tolerance
+  - output identity A01: gap 71.1
+  - output identity A02: gap 9.5
+  - output identity A03: gap 6.8
+  - output identity B: gap 89.2
+  - output identity C10-12: gap 598.2
+  - output identity C13-15: gap 48.9
+  - output identity C16: gap 33.6
+  - output identity C17: gap 93.8
+  - output identity C18: gap 52.8
+  - output identity C19: gap 265.8
+  - output identity C20: gap 196.0
+  - output identity C21: gap 24.2
+- Supply-vs-use output cross-check: 34 industries differ (>EUR 1m)
+- Import identity cross-check (TS_BP = domestic + imports): max gap EUR 982.8m
+- Commodity balance closure: 60/60 products within EUR 1m; largest residual EUR 0m
+- Suppressed detail (macro cells use the published totals; the leaf detail covers):
+  - final demand (P3_S13): 92.6%
+  - final demand (P3_S14): 99.3%
+  - final demand (P52): 99.9%
+  - final demand (P6): 97.7%
+  - gross output: 96.7%
+  - imports (P7): 98.6%
+  - intermediate consumption: 94.5%
+  - product taxes (D21X31): 99.4%
+  - value added (B2A3G): 97.0%
+  - value added (D1): 97.7%
+  - value added (D29X39): 97.4%
+- Note: identity findings above may reflect the same suppression (an identity cannot close over cells the source withholds), not errors in the published data.
+
+## Generated macro SAM (18 accounts, EUR million)
+
+- GDP at basic prices (generated): EUR 469,114m
+- Account balance residuals (row minus column):
+
+| Account | Residual (EURm) | % of GDP |
+|---|---|---|
+| act | +0 | +0.000% |
+| atx | +0 | +0.000% |
+| cap | +0 | +0.000% |
+| com | -0 | -0.000% |
+| corp | +4,377 | +0.933% |
+| d4x | +0 | +0.000% |
+| d8 | +0 | +0.000% |
+| d9 | -1 | -0.000% |
+| dtx | +1 | +0.000% |
+| gvt | +1,128 | +0.240% |
+| hhd | +4,977 | +1.061% |
+| lab | -3,950 | -0.842% |
+| ptx | +0 | +0.000% |
+| row | -4,513 | -0.962% |
+| si | -2,020 | -0.431% |
+| soc_b | +2 | +0.000% |
+| soc_c | -1 | -0.000% |
+| trf | +0 | +0.000% |
+
+Residuals are reported, not hidden; they typically attach to ESA boundary items (domestic-vs-national concept in compensation, mixed-income attribution, capital-account detail). Inspect any account above a few percent of GDP before use.

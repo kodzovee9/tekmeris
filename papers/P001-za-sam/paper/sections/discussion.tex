@@ -1,0 +1,137 @@
+\section{Discussion}\label{sec:discussion}
+
+\subsection{A taxonomy of divergence between record and artefact}
+
+Set side by side, the audit's findings sort into five classes, and it is
+worth stating plainly that every reported finding was \emph{first
+detected} by arithmetic---an identity refusing to close, a grid search
+returning a unique survivor---and only then interpreted against the
+source record (Appendix~\ref{app:evidence} states each finding's
+evidentiary status):
+
+\begin{enumerate}
+  \item \textbf{Names mislead.} Account codes mislabel their contents
+  (\texttt{atx}, \texttt{cler}, \texttt{craf}); dictionary descriptions
+  rotate against their codes (\texttt{mach}/\texttt{nitc}/\texttt{trnp}).
+  Any pipeline that classifies by prefix or label inherits these slips
+  silently; ours refuses to, and both of the audit's largest apparent
+  anomalies (R479~billion of phantom intermediates; a 125\,per\,cent
+  value-added ``error'') dissolved into classification fixes.
+  \item \textbf{Prose diverges from data.} A formula's printed signs do not
+  reproduce the matrix they describe; the same cell is printed with two
+  different values in two places. The data adjudicate.
+  \item \textbf{Vintages drift.} The default download of a source (AFS 2019
+  preliminary) is not the edition actually used (2019 revised); nothing in
+  the record says so, and only a grid test can tell.
+  \item \textbf{Inputs are unavailable.} One input is unpublished; its
+  effect ($+16.1$\,per\,cent on import duties under the public proxy) is
+  invisible until priced.
+  \item \textbf{Adjustments go unrecorded.} A symmetric R596~million
+  reconciling edit balances two accounts and appears nowhere in the record;
+  inherited consumption shares import a different survey vintage's
+  processing into a matrix whose documentation implies otherwise.
+\end{enumerate}
+
+To repeat the point made in Section~\ref{sec:results}: these are properties
+of the \emph{medium}---prose describing spreadsheets---not of the authors,
+whose record-keeping is far better than the norm. That is precisely what
+makes the count sobering: if the best-documented SAM in its class carries
+five classes of silent divergence between record and artefact, the median
+SAM---with no dictionary, no formula note, no distributed matrix---is
+unauditable in principle.
+
+The two further applications confirm that the taxonomy travels. Kenya
+exhibits class~3 (the SAM's production side sits a uniform 1.0\,per\,cent
+from the Economic Survey print, the signature of a provisional-accounts
+vintage) and class~5 at national scale (the accounts' own
+3.6-per-cent-of-GDP discrepancy is absorbed by the reconciliation with no
+cell-level record of where). The Netherlands, with the cleanest data of
+the three, still exhibits class~1: Eurostat's mixed-granularity category
+lists and a NACE/ESA code collision would silently double-count under
+prefix-based selection, and were caught only by the toolkit's tiling
+assertion.
+
+\subsection{From audit to construction workflow}
+\label{sec:discussion:workflow}
+
+The framework is not only a microscope; it is a factory. The same pipeline
+that audits the benchmark \emph{builds} a SAM: scripts ingest and verify
+the official tables, assemble the production and commodity blocks
+mechanically, compute the institutional cells from published series,
+apply survey-based share systems, and balance the result with a logged
+adjustment. What remains for the economist is exactly the residue that
+identities and obtainable data cannot determine---in this application, the
+customs split, six sectors' capital shares, and the distributional detail
+of household income. That inversion is the practical payoff: expert
+attention stops being spread across ten thousand spreadsheet cells and
+concentrates on the handful of judgments that genuinely require it, each
+of which the framework forces into the open as a numbered rule. Updating
+the matrix for a new benchmark year, or transferring it to a country with
+comparable sources, reuses everything except those judgments.
+
+\subsection{Implications: a standards proposal}
+\label{sec:discussion:standards}
+
+Two practices would have made most of this paper's detective work
+unnecessary, and both are cheap. We state them as a proposal for producers
+of SAMs---statistical offices, research institutes, and international
+programmes alike:
+
+\begin{enumerate}
+  \item \textbf{Publish cell-level provenance.} Each cell of a released SAM
+  should carry its source series, transformation, and any manual
+  adjustment. The R596~million edit and the inherited consumption shares
+  would then be declarations rather than discoveries, and reconciling
+  interventions---a normal part of compilation---would be visible instead
+  of latent.
+  \item \textbf{Publish machine-readable construction rules.} The
+  benchmark's technical note was nearly a program; had it been an actual
+  one (as our transcribed formula table now is), the sign discrepancy could
+  not have survived contact with the data, and replication would be a
+  command rather than a project. Concordances, account dictionaries, and
+  balancing targets belong in the same release.
+\end{enumerate}
+
+Neither requires changing a single methodological choice, and both are
+by-products of building the matrix in code to begin with. Our toolkit is
+offered as working infrastructure for exactly that: an open reference
+implementation of registered sources, executable identities, explicit
+classification, formula tables, diagnostic balancing, and workbook
+generation, intended to be reused wholesale for other countries and years.
+
+\subsection{Cost: a three-country ledger}
+
+We report the development ledger factually and claim nothing causal about
+labour saving from it. The South African case required registering
+sources from four providers, one registered microdata access, and bulk
+downloads worked around a non-functioning online query system; the Kenyan
+case required locating condensed print tables inside a 322-page yearbook;
+the Dutch case required three API calls and roughly 300 new lines of code
+(70 of them a reader that now serves every ESA-transmitting country). The
+claim we do make is conditional and testable: the marginal cost of the
+\emph{next} SAM built on the toolkit is largely the cost of its
+country-specific concordances and share systems, and the Dutch
+application is a first operational indication of that claim at the macro
+level. Across the three cases, publication format emerges as a major
+determinant of marginal implementation effort---which is what the
+standards proposal above is for.
+
+\subsection{Limitations}
+
+The deep audit inherits its benchmark's scope---one country, one year, one
+SAM family---and the two further applications, while they demonstrate
+transfer, are deliberately shallower: Kenya stops at structure and macro
+controls because the machine-readable detail is not public, and the Dutch
+exercise generates and balances a macro SAM, not a full multi-sector SAM with
+distributional detail (that extension is mechanical for the production
+core, which the API supplies at 65 industries, but household disaggregation
+would require the national budget-survey work the South African case
+illustrates). Six activities' capital splits and the item-level detail of the
+household systems remain beyond the inputs we hold, and our
+balanced household block is a disciplined proxy, not a reconstruction---
+closing that gap requires the survey's item-level classifications, which
+are obtainable and queued. The recovered choices (editions, measures,
+signs) are unique within their tested grids, not proofs of intent.
+Finally, our own pipeline's mistakes---one of which we document---were
+caught by the same assertions we advocate; we take that as the strongest
+available evidence for building them in.

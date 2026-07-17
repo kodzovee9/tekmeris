@@ -1,0 +1,16 @@
+# Capital-stock disaggregation report
+
+Generated 2026-07-16 by code/07_split_capital.py.
+
+- Table A4 parsed from the technical note: 287 SIC codes; AFS SIC blocks unmapped: none
+- Activities covered by AFS: 55/61; not covered: aagri, aeduc, afins, ainsp, anobs, apuba
+
+## Share agreement with the benchmark, by stock measure
+
+| Measure | Comparisons | Median |diff| (pp) | Mean (pp) | Max (pp) | Within 1pp |
+|---|---|---|---|---|---|
+| opening | 318 | 0.7209 | 2.4363 | 35.6367 | 58.2% |
+| closing | 318 | 0.1797 | 1.8518 | 34.1684 | 73.6% |
+| average | 318 | 0.5044 | 2.0764 | 34.9030 | 65.7% |
+
+Shares compared per activity: AFS capital-type share vs benchmark capital-row share of activity GOS. Full closing-measure table: capital_split.csv.

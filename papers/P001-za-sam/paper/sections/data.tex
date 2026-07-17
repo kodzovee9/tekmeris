@@ -1,0 +1,62 @@
+\section{Data}\label{sec:data}
+
+Every input is recorded in a source registry with publisher, vintage, access
+date, licence status, and SHA-256 hash; raw files are never modified, and
+artefacts derived from them carry lineage to the registry entry. The South
+African sources are:
+
+\begin{itemize}
+  \item \textbf{Supply and use tables} (Stats~SA Report 04-04-03): the
+  2018--2019 workbook with supply and use tables at 124 industries and 108
+  products, plus the accompanying methodological report. These are the sole
+  inputs to the production and commodity blocks.
+  \item \textbf{Benchmark SAM} (UNU-WIDER Technical Note 2023/1): the
+  distributed workbook of \citet{vanseventer2023}---two 209-account SAMs
+  (occupational and educational wage detail), an account dictionary, and
+  industry/product concordances---plus the technical note itself, from which
+  we transcribe the 46 macro cell formulas and three mapping tables. The
+  workbook is used \emph{only} as the audit target and as the published
+  source of its own concordances; no benchmark value enters our SAM except
+  where explicitly flagged (the single unpublished input, in the as-built
+  scenario only).
+  \item \textbf{SARB Quarterly Bulletin} (December 2022 bulk files): all 69
+  annual KBP series required by the technical note's formulas. We verify the
+  vintage directly: household consumption and imports in these files equal
+  the benchmark's corresponding cells exactly, at the precision the
+  bulletin files report (this vintage check is the one comparison made at
+  source precision rather than at the R0.5~million audit tolerance of
+  Section~\ref{sec:method:terms}).
+  \item \textbf{Annual Financial Statistics} (Stats~SA P0021): the PPE
+  schedules (asset type $\times$ SIC industry) from both the 2019
+  preliminary and 2019 revised editions---the comparison matters, as
+  Section~\ref{sec:results} shows.
+  \item \textbf{Labour Market Dynamics} 2018 and 2019 and \textbf{Living
+  Conditions Survey} 2014/15 microdata (Stats~SA via DataFirst): used only
+  to compute aggregated shares (occupational wage bills; household groups).
+  Under the access conditions, no microdata are redistributed; the
+  replication package ships the scripts and the aggregated shares.
+\end{itemize}
+
+One input to the benchmark is not public: the split of import duties from
+other product taxes rests on customs data that its technical note describes
+as ``made available by Statistics South Africa as unpublished
+data''.\footnote{\citet[item vii]{vanseventer2023}. The note does not
+describe how the data were provided or in what form; we assert nothing
+beyond its own wording.} We treat this input as a first-class object:
+registered in the source registry, flagged in the formula table, propagated
+to the three cells it touches, and priced by a public proxy
+(Section~\ref{sec:results:macro}).
+
+The two further applications add three registered sources. For Kenya: the
+IFPRI 2019 Nexus SAM \citep{thurlow2021}, distributed under CC-BY-4.0 via
+Harvard Dataverse, and the KNBS Economic Survey 2020
+\citep{knbs2020}, whose current-price national-accounts tables supply the
+macro controls; the 2009 benchmark supply and use tables exist in
+condensed form in the Economic Survey 2014, with the full 151-product
+database available from KNBS on request but not published
+machine-readably. For the Netherlands: the Eurostat dissemination API
+\citep{eurostat2024}, from which three requests retrieve the 2019 supply
+table, use table, and non-financial sector accounts (datasets
+\texttt{naio\_10\_cp15}, \texttt{naio\_10\_cp16},
+\texttt{nasa\_10\_nf\_tr}); the retrieved JSON responses are registered
+and hashed like every other raw input.

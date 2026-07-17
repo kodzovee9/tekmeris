@@ -1,0 +1,156 @@
+"""Household disaggregation via the LCS 2014/15: group construction + anchors.
+
+The benchmark identifies 14 household groups: expenditure deciles 1-9 plus
+the top decile split into five 2% bands (TN Section 2). This script builds
+those groups from the LCS households file (S-006) under two welfare-measure
+variants (household expenditure; per-capita expenditure), then runs two
+anchor validations against the benchmark that need no LCS item dictionary:
+
+1. Consumption anchor: each group's share of total household expenditure vs
+   the benchmark's household-column totals over commodity rows (PCE by group).
+2. Wage-income anchor: each group's share of salary/wage income (person-income
+   item 50110000, the dominant income item) vs the benchmark's labour-to-
+   household block summed over occupations.
+
+Only aggregated shares are published; microdata are not redistributed.
+
+Run from this directory, after 01 and 04:
+    python 09_split_households.py
+"""
+
+import csv
+import io
+import sys
+import zipfile
+from datetime import date
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parents[3] / "toolkit" / "src"))
+from edikit.data.sam import read_labeled_matrix  # noqa: E402
+
+DATA = Path(__file__).parents[1] / "data"
+OUT = Path(__file__).parents[1] / "outputs"
+LCS_ZIP = DATA / "external" / "lcs-2014-2015-v1-csv.zip"
+HH_CSV = "csv/lcs-2014-2015-households-v1.csv"
+PINC_CSV = "csv/lcs-2014-2015-personincome-v1.csv"
+SAM_XLSX = DATA / "external" / "tn2023-1-2019-SASAM-for-distribution.xlsx"
+SAM_SHEET = "SASAM 2019 61Ind 10Occ"
+WAGE_ITEM = "50110000"  # salaries and wages (dominant person-income item)
+OCCS = {"mang", "prof", "tech", "cler", "sale", "skag", "craf", "oper", "elmn", "doms"}
+GROUPS = [f"hhd{i}" for i in range(1, 15)]
+
+
+def build_groups(welfare_col: str) -> dict[str, int]:
+    """Assign each household UQNO to group 1..14 by weighted quantiles of
+    `welfare_col`: deciles 1-9, then five 2% bands within the top decile."""
+    rows = []
+    with zipfile.ZipFile(LCS_ZIP) as z, z.open(HH_CSV) as f:
+        for r in csv.DictReader(io.TextIOWrapper(f, encoding="utf-8", errors="replace")):
+            try:
+                w = float(r["hholds_wgt"])
+                v = float(r[welfare_col])
+            except (ValueError, KeyError):
+                continue
+            rows.append((v, w, r["UQNO"]))
+    rows.sort()
+    total_w = sum(w for _, w, _ in rows)
+    # cut points at 10%,20%,...,90%, then 92,94,96,98
+    cuts = [0.1 * i for i in range(1, 10)] + [0.92, 0.94, 0.96, 0.98]
+    assign: dict[str, int] = {}
+    cum = 0.0
+    ci = 0
+    for v, w, uqno in rows:
+        cum += w
+        while ci < len(cuts) and cum / total_w > cuts[ci] + 1e-12:
+            ci += 1
+        assign[uqno] = ci + 1  # 1..14
+    return assign
+
+
+def weighted_by_group(assign: dict[str, int], value_of) -> list[float]:
+    tot = [0.0] * 14
+    for uqno, v in value_of():
+        g = assign.get(uqno)
+        if g:
+            tot[g - 1] += v
+    return tot
+
+
+def hh_expenditure():
+    with zipfile.ZipFile(LCS_ZIP) as z, z.open(HH_CSV) as f:
+        for r in csv.DictReader(io.TextIOWrapper(f, encoding="utf-8", errors="replace")):
+            try:
+                yield r["UQNO"], float(r["expenditure"]) * float(r["hholds_wgt"])
+            except (ValueError, KeyError):
+                continue
+
+
+def wage_income():
+    with zipfile.ZipFile(LCS_ZIP) as z, z.open(PINC_CSV) as f:
+        for r in csv.DictReader(io.TextIOWrapper(f, encoding="utf-8", errors="replace")):
+            if r["Coicop"].strip() == WAGE_ITEM:
+                try:
+                    yield r["UQNO"], float(r["Valueannualized_adj_weighted"])
+                except ValueError:
+                    continue
+
+
+def shares(vals: list[float]) -> list[float]:
+    t = sum(vals)
+    return [v / t for v in vals] if t else vals
+
+
+def main() -> None:
+    sam = read_labeled_matrix(str(SAM_XLSX), SAM_SHEET)
+    kinds_comm = set()
+    with open(DATA / "derived" / "sam_account_map.csv", newline="") as f:
+        for r in csv.DictReader(f):
+            if r["kind"] == "commodity":
+                kinds_comm.add(r["code"])
+
+    pce = [sum(v for (rr, c), v in sam.cells.items() if c == g and rr in kinds_comm)
+           for g in GROUPS]
+    labr = [sum(v for (rr, c), v in sam.cells.items() if rr == g and c in OCCS)
+            for g in GROUPS]
+    bench_pce, bench_wage = shares(pce), shares(labr)
+
+    results = {}
+    for variant, col in [("household expenditure", "expenditure"),
+                         ("per-capita expenditure", "expenditure_pcp")]:
+        assign = build_groups(col)
+        lcs_pce = shares(weighted_by_group(assign, hh_expenditure))
+        lcs_wage = shares(weighted_by_group(assign, wage_income))
+        results[variant] = (lcs_pce, lcs_wage)
+
+    OUT.mkdir(exist_ok=True)
+    with open(OUT / "household_split.md", "w") as f:
+        f.write(f"# Household disaggregation report\n\nGenerated {date.today()} by "
+                f"code/09_split_households.py.\n\n")
+        f.write("14 groups: expenditure deciles 1-9 + top decile in five 2% bands, "
+                "built by weighted quantiles from the LCS households file.\n\n")
+        for anchor, bench, idx in [("Consumption (PCE by group)", bench_pce, 0),
+                                   ("Wage income by group", bench_wage, 1)]:
+            f.write(f"## Anchor: {anchor}\n\n")
+            f.write("| Group | Benchmark | " +
+                    " | ".join(results.keys()) + " |\n")
+            f.write("|---|---|" + "---|" * len(results) + "\n")
+            for i, g in enumerate(GROUPS):
+                cells = " | ".join(f"{results[v][idx][i]*100:.2f}%" for v in results)
+                f.write(f"| {g} | {bench[i]*100:.2f}% | {cells} |\n")
+            for v in results:
+                devs = [abs(results[v][idx][i] - bench[i]) for i in range(14)]
+                f.write(f"\n{v}: mean |dev| {sum(devs)/14*100:.3f}pp, "
+                        f"max {max(devs)*100:.3f}pp\n")
+            f.write("\n")
+        f.write("Only aggregated shares are published; LCS microdata are not "
+                "redistributed.\n")
+
+    for v, (p, wg) in results.items():
+        dp = [abs(p[i] - bench_pce[i]) for i in range(14)]
+        dw = [abs(wg[i] - bench_wage[i]) for i in range(14)]
+        print(f"{v:24s} PCE mean {sum(dp)/14*100:.3f}pp max {max(dp)*100:.3f}pp | "
+              f"wages mean {sum(dw)/14*100:.3f}pp max {max(dw)*100:.3f}pp")
+
+
+if __name__ == "__main__":
+    main()

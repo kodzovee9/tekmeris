@@ -1,0 +1,126 @@
+"""Generate the transparent P001 SAM workbook - the flagship deliverable.
+
+One auditable Excel file containing: README (what/how/regeneration), the
+source registry with hashes, the account map, the full 209-account balanced
+SAM with LIVE total and balance-check formulas, the balancing adjustment log
+(v0.2 vs v0.1 factors per household cell), the disclosed rules R1-R7, and
+the kind-level macro SAM. Everything regenerates from code; nothing in the
+workbook is hand-typed.
+
+Run from this directory, after 10 and 11:  python 12_generate_workbook.py
+"""
+
+import csv
+import re
+import sys
+from datetime import date
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parents[3] / "toolkit" / "src"))
+from openpyxl import Workbook  # noqa: E402
+
+from edikit.report.workbook import (  # noqa: E402
+    add_matrix_sheet,
+    add_readme_sheet,
+    add_table_sheet,
+)
+
+DATA = Path(__file__).parents[1] / "data"
+OUT = Path(__file__).parents[1] / "outputs"
+CODE = Path(__file__).parent
+
+RULES = [
+    "R1 mtx by commodity: total = KBP4590J (public proxy for unpublished customs data), allocated by import shares.",
+    "R2 stx by commodity: SUT product-tax column minus R1's mtx.",
+    "R3 capital-type shares for six AFS-uncovered activities: economy-wide average shares.",
+    "R4 household consumption pattern: uniform Engel (total-expenditure group shares) pending LCS item file.",
+    "R5 occupation-to-household wages: aggregate LCS wage-income group shares for every occupation.",
+    "R6 other household-facing cells: LCS wage-income group shares as income-side proxy.",
+    "R7 capital income to institutions uniform across capital types (the benchmark's own documented rule).",
+    "Balancing: household income block RAS-adjusted to group outlay totals; factors logged on the Adjustments sheet.",
+]
+
+
+def load_cells(path) -> dict[tuple[str, str], float]:
+    with open(path, newline="") as f:
+        return {(r["row"], r["col"]): float(r["value_Rm"]) for r in csv.DictReader(f)}
+
+
+def main() -> None:
+    accounts, acct_rows = [], []
+    with open(DATA / "derived" / "sam_account_map.csv", newline="") as f:
+        for r in csv.DictReader(f):
+            accounts.append(r["code"])
+            acct_rows.append([r["code"], r["kind"], r["description"],
+                              r["source_sheet"], r["flag"]])
+
+    v01 = load_cells(OUT / "p001_sam_v01.csv")
+    v02 = load_cells(OUT / "p001_sam_v02.csv")
+
+    src_rows = []
+    text = open(DATA / "SOURCES.md", encoding="utf-8").read()
+    for m in re.finditer(r"## (S-\d{3}[^\n]*)", text):
+        seg = text[m.end():text.find("##", m.end()) if text.find("##", m.end()) > 0 else None]
+        title = re.search(r"\| Title \| ([^|]+) \|", seg or "")
+        sha = re.findall(r"`([0-9a-f]{8,64}(?:…[0-9a-f]{4,})?)`", seg or "")
+        src_rows.append([m.group(1).strip(), (title.group(1).strip() if title else ""),
+                         "; ".join(sha[:3])])
+
+    adj_rows = []
+    hhds = {f"hhd{i}" for i in range(1, 15)}
+    for (r, c), v in sorted(v02.items()):
+        if r in hhds and (r, c) in v01 and v01[(r, c)] > 0:
+            f = v / v01[(r, c)]
+            if abs(f - 1) > 1e-9:
+                adj_rows.append([r, c, round(v01[(r, c)], 3), round(v, 3), round(f, 5)])
+
+    macro_rows = []
+    with open(OUT / "macro_sam_by_kind.csv", newline="") as f:
+        rd = list(csv.reader(f))
+        macro_header, macro_rows = rd[0], rd[1:]
+
+    wb = Workbook()
+    add_readme_sheet(wb, "P001 - A 2019 Social Accounting Matrix for South Africa (v0.2)", [
+        f"Generated {date.today()} by papers/P001-za-sam/code/12_generate_workbook.py.",
+        "Tekmeris / P001: a transparent, reproducible SAM built from public data only.",
+        "",
+        "Nothing in this workbook is hand-typed: every sheet regenerates from the",
+        "replication code (scripts 01-12), and the SAM sheet's totals and balance",
+        "checks are live Excel formulas so the accounting identities recompute in",
+        "front of you.",
+        "",
+        "Sheets: Sources (registry with SHA-256 hashes), Accounts (209-account map),",
+        "SAM v0.2 (balanced matrix with live checks), Adjustments (per-cell RAS",
+        "factors, household income block), Rules (disclosed constructions R1-R7),",
+        "Macro SAM (kind-level aggregation).",
+        "",
+        "Benchmark: van Seventer & Davies (2023), UNU-WIDER Technical Note 2023/1.",
+        "The production and commodity blocks reproduce the benchmark exactly; the",
+        "institutional block is a public-replication scenario with every departure",
+        "disclosed on the Rules sheet. Microdata (LCS/LMD) are used only as",
+        "aggregated shares and are not redistributed.",
+        "",
+        "License status: draft research output; see repository SOURCES.md before",
+        "any redistribution.",
+    ])
+    add_table_sheet(wb, "Sources", ["Registry entry", "Title", "Hashes (SHA-256)"],
+                    src_rows, widths=[42, 60, 70])
+    add_table_sheet(wb, "Accounts", ["Code", "Kind", "Description", "Source sheet", "Flag"],
+                    acct_rows, widths=[10, 18, 52, 30, 22])
+    add_matrix_sheet(wb, "SAM v0.2", accounts, v02)
+    add_table_sheet(wb, "Adjustments",
+                    ["Household group", "Payer", "v0.1 (Rm)", "v0.2 (Rm)", "RAS factor"],
+                    adj_rows, widths=[16, 10, 14, 14, 12])
+    add_table_sheet(wb, "Rules", ["Disclosed construction rules"],
+                    [[r] for r in RULES], widths=[120])
+    add_table_sheet(wb, "Macro SAM", macro_header, macro_rows,
+                    widths=[18] + [14] * (len(macro_header) - 1))
+
+    out = OUT / "P001_SA_SAM_2019_v02.xlsx"
+    wb.save(out)
+    print(f"written {out.name}: {len(wb.sheetnames)} sheets, "
+          f"{len(v02):,} SAM cells, {len(adj_rows)} logged adjustments")
+
+
+if __name__ == "__main__":
+    main()

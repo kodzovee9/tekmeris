@@ -1,0 +1,159 @@
+\section{Two further applications: the replicability spectrum}
+\label{sec:applications}
+
+The South African audit is the framework's deep case, but a method whose
+value is generality must be shown doing different jobs under different data
+regimes. This section applies it twice more, at the two ends of the public
+data spectrum. In Kenya, where the machine-readable supply--use detail
+behind the country's leading SAM is not published, the framework
+establishes what \emph{can} be verified from public aggregates---and shows
+exactly where verification must stop. In the Netherlands, where complete
+harmonised tables are a single API call away, the framework runs in the
+opposite direction: not auditing an existing SAM but \emph{generating} one,
+with no benchmark consulted at any point. Together with South Africa the
+three cases trace a replicability spectrum that we argue is the right way
+to think about SAM infrastructure worldwide.
+
+\subsection{Kenya: auditing at the aggregate boundary}
+\label{sec:applications:kenya}
+
+The most widely used Kenyan SAM is IFPRI's 2019 Nexus matrix
+\citep{thurlow2021}, distributed as an open CC-BY dataset. Its
+construction, like that of the Nexus programme generally, reconciles
+scattered sources by cross-entropy estimation \citep{robinson2001}, so
+cell-level replication of the kind achieved for South Africa is not the
+relevant test: a CE-reconciled matrix is a model output, and the honest
+question is what its public record allows an outsider to verify. The
+framework's answer has three layers.
+
+\emph{Structure verifies.} The distributed file parses into 108 accounts
+whose groups (42 activities, 42 commodities, five factors, ten
+representative households, and the transaction-cost, enterprise,
+government, tax, accumulation, and external accounts) match the data
+paper's stated design exactly. The matrix balances only to the file's own
+integer rounding---values are printed in whole Sh billions, and account
+imbalances reach Sh~5~billion---which is itself a small finding about
+distribution practice: rounding a balanced matrix unbalances it.
+
+\emph{Macro controls verify approximately, and the deviations are
+informative.} Table~\ref{tab:kenya} compares the SAM's implied national
+aggregates with the published current-price tables of the KNBS Economic
+Survey 2020. The production side sits a uniform 1.0\,per\,cent below the
+published figures---GVA, product taxes, and GDP all shifted
+together---which is the signature of a vintage difference in the
+then-provisional 2019 accounts, not of a methodological choice
+(Section~\ref{sec:discussion}'s class~3). Fixed capital formation,
+inventories, and imports agree essentially exactly. The large deviations
+are concentrated in private consumption ($-9.2$\,per\,cent), government
+consumption ($+9.1$\,per\,cent), and exports ($+13.6$\,per\,cent), and
+they have a structural explanation: KNBS's own expenditure table carries a
+production-versus-expenditure discrepancy of Sh~$-352$~billion
+(3.6\,per\,cent of GDP), and a balanced SAM cannot carry a statistical
+discrepancy---the reconciliation \emph{must} allocate it somewhere. The
+deviation pattern is consistent with the discrepancy, together with
+associated source and definitional differences, being absorbed primarily
+through the consumption and trade aggregates; aggregate comparisons
+cannot identify the allocation uniquely, and that very limit is the
+point. Nothing in the public record documents the allocation at the
+level where it acts, which is precisely the provenance gap the paper's
+proposal addresses.
+
+\begin{table}[t]
+\centering\small
+\caption{Kenya: the IFPRI 2019 Nexus SAM against published KNBS controls
+(Sh billion, current prices; Economic Survey 2020, Tables 2.1 and 2.7,
+2019 provisional).}
+\label{tab:kenya}
+\input{tables/tab_kenya}
+\end{table}
+
+\emph{Cell-level audit is blocked by publication practice, not by
+method.} The SAM's supply--use core descends from KNBS's 2009 benchmark
+tables, whose full balanced database (151 products by 81 industries) is,
+per the Economic Survey, available from KNBS on request but published only
+as condensed print tables. The pipeline that reproduced South Africa's
+production block exactly would run unchanged on the Kenyan detail; what it
+lacks is a machine-readable input, not a method. That boundary---audit
+feasible in principle, blocked by format---defines the middle of the
+replicability spectrum.
+
+\subsection{The Netherlands: benchmark-free generation}
+\label{sec:applications:nl}
+
+The third application inverts the exercise. For a country inside the
+European statistical system, the framework should need no benchmark, no
+technical note, and no manual acquisition: the ESA transmission programme
+puts harmonised supply--use tables and sector accounts on a public API
+\citep{eurostat2008}. We test that claim on the Netherlands for 2019.
+Three API calls retrieve the supply table, the use table, and the full
+sequence of non-financial sector accounts (about 180~KB in total); a
+70-line JSON-stat reader added to the toolkit decodes them, and a single
+script assembles a macro accounting matrix and balances it into a macro
+SAM. No published SAM was consulted at any point during construction or
+validation.
+
+Two results follow. First, \emph{the official tables are internally
+exact}: every identity the toolkit enforces---output and value-added
+identities for all 65 industries, the import identity, and the
+supply--demand balance of all 65 products---closes at a EUR~1~million
+tolerance with zero findings. The contrast with the audit cases is the
+point: when a statistical office publishes machine-readable tables under a
+harmonised standard, deterministic verification is free. Even here,
+however, the framework's refusal to classify by convention earned its
+keep: Eurostat's category lists mix aggregates with overlapping
+sub-details (NACE section codes alongside their own divisions), and a
+na\"ive selection double-counts; the toolkit's coverage-based partition,
+guarded by an assertion that the chosen codes tile the total exactly,
+caught both this and a code collision between the NACE section~P
+(education) and the ESA transaction P-codes. Names mislead in Luxembourg
+as in Pretoria.
+
+Second, \emph{the generated matrix closes to within 1.5\,per\,cent of
+GDP with every residual attributed---and a logged balancing step then
+closes it exactly}. We are careful with terminology here: a SAM is
+defined by every account balancing, so the direct output of the
+generation---the 18-account \emph{macro accounting matrix}---is the
+diagnostic product, and the SAM is what balancing makes of it. The matrix
+routes factor income, taxes, transfers, and the ESA bridging items (the
+pension-fund adjustment D8, capital transfers D9, net lending B9, and the
+residents-abroad consumption adjustments) through explicit instrument
+accounts; GDP at basic prices emerges at EUR~724{,}960~million, on the
+published figure, and compensation of employees closes to the euro across
+four independent series. Table~\ref{tab:netherlands} reports the residual
+of every account before balancing: twelve are exactly zero, and the six
+that are not are all below 1.5\,per\,cent of GDP and attach to known ESA
+boundary items (the domestic-versus-national concept in compensation,
+mixed-income attribution, capital-account detail). Consistent with the
+framework's first commitment, the residuals are published, not hidden;
+the balanced macro SAM is then produced by the toolkit's logged RAS
+step: it converges to a maximum residual below EUR~0.01~million with all
+70 adjustment factors inside $[0.983, 1.028]$, concentrated on the
+rest-of-world cells---exactly where the attributed residuals sat---and
+every factor ships with the matrix. The balancing choices (the treatment
+of two negative cells, the target vector, and the choice of RAS), the
+invariants they preserve, and a target-vector sensitivity check are
+documented in Appendix~\ref{app:nlbalance}.
+
+\begin{table}[t]
+\centering\small
+\caption{Netherlands: account residuals of the generated 2019 macro
+accounting matrix, before balancing (no benchmark consulted; GDP at basic
+prices EUR 724{,}960m). The logged RAS step closes all residuals with
+adjustment factors in $[0.983, 1.028]$.}
+\label{tab:netherlands}
+\input{tables/tab_netherlands}
+\end{table}
+
+The cost ledger deserves its own sentence, because it carries the paper's
+economic claim. The South African reconstruction required four public
+providers, a registered microdata access, and bulk downloads diagnosed
+around a broken online query system; the Kenyan case required locating
+condensed print tables inside a 322-page yearbook; the Dutch case required
+three API calls and a single working session, and the 70-line reader that
+enabled it works unchanged for every country in the ESA transmission
+programme. Out-of-sample runs for Austria and Poland confirm that the
+generator transfers---and that confidentiality suppression remains a
+cell-level constraint even under harmonised publication;
+Appendix~\ref{app:transfer} reports the results. The marginal cost of a verified macro SAM, conditional on the
+toolkit, has fallen to approximately the cost of the data's publication
+format---which is the replicability spectrum stated as a price.

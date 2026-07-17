@@ -1,0 +1,52 @@
+# Netherlands: benchmark-free macro-SAM generation
+
+Generated 2026-07-17 by code/15_netherlands_generate.py from Eurostat API data (S-011); no benchmark consulted.
+
+## Internal validation of the Eurostat SUT
+
+- Industries: 65 (supply) / 65 (use); products: 65
+- Output and VA identities: 0 findings at EUR 1m tolerance
+- Supply-vs-use output cross-check: 0 industries differ (>EUR 1m)
+- Import identity cross-check (TS_BP = domestic + imports): max gap EUR 0.0m
+- Commodity balance closure (TS_PP = intermediates + final demand): 65/65 products within EUR 1m; largest residual EUR 0m (adjustment rows OP_RES/OP_NRES handled per N4)
+
+## Generated macro accounting matrix (18 accounts, EUR million, pre-balancing)
+
+- GDP at basic prices (generated): EUR 724,960m
+- Account balance residuals (row minus column):
+
+| Account | Residual (EURm) | % of GDP |
+|---|---|---|
+| act | +0 | +0.000% |
+| atx | +0 | +0.000% |
+| cap | +0 | +0.000% |
+| com | +0 | +0.000% |
+| corp | +1,532 | +0.211% |
+| d4x | +0 | +0.000% |
+| d8 | +0 | +0.000% |
+| d9 | +0 | +0.000% |
+| dtx | +0 | +0.000% |
+| gvt | +1,443 | +0.199% |
+| hhd | +9,111 | +1.257% |
+| lab | -4,193 | -0.578% |
+| ptx | +0 | +0.000% |
+| row | -10,830 | -1.494% |
+| si | +2,937 | +0.405% |
+| soc_b | +0 | +0.000% |
+| soc_c | +0 | +0.000% |
+| trf | +0 | +0.000% |
+
+All residuals are below 1.5% of GDP and attach to known ESA boundary items (domestic-vs-national concept in compensation, mixed-income attribution, capital-account detail); they are reported, not hidden. No benchmark was consulted at any point.
+
+## Balanced macro SAM (rule N5)
+
+- Negative cells flipped to their positive transpose before balancing: (row,cap), (row,d8)
+- RAS against account targets = mean(receipts, payments): converged in 418 iterations; max residual EUR 0.009m
+- Adjustment factors: 70 cells in [0.9832, 1.0282] (max |f-1| = 2.82%), concentrated on rest-of-world cells - consistent with the pre-balancing residual pattern; every factor ships in the balanced CSV
+- Target-vector sensitivity (vs the mean-target SAM, common total): receipts-as-targets moves no cell by more than EUR 6,403m (max 6.55% among cells above EUR 100m); payments-as-targets moves no cell by more than EUR 6,326m (max 6.52% among cells above EUR 100m)
+
+## Cost log
+
+- Data acquisition: 3 API calls (~180KB), zero manual steps
+- New code for this case: the JSON-stat reader (~70 lines, reusable for ~30 countries) and this script; all other machinery reused from the South African case
+- Elapsed effort: a single working session

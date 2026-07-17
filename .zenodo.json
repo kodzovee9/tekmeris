@@ -1,0 +1,10 @@
+{
+  "title": "Tekmeris: reproducible construction and auditing of social accounting matrices (edikit)",
+  "upload_type": "software",
+  "license": "Apache-2.0",
+  "creators": [{"name": "Abalo, Kodzovi"}],
+  "keywords": ["social accounting matrix", "supply and use tables",
+               "national accounts", "reproducibility", "RAS balancing",
+               "Eurostat", "input-output"],
+  "description": "Open toolkit (edikit) and replication package for reproducible construction and auditing of social accounting matrices from official statistics. Includes the P001 working paper's complete pipeline: a cell-level audit of the 2019 South African SAM, a macro-controls audit of the IFPRI 2019 Kenya SAM, and benchmark-free macro-SAM generation for ESA-transmitting countries from the Eurostat API."
+}

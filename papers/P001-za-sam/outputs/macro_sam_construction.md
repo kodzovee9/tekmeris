@@ -1,0 +1,35 @@
+# Macro-SAM construction report
+
+Generated 2026-07-16 by code/06_construct_macro_sam.py.
+
+Every institutional cell computed from SARB KBP series (December 2022 vintage) using the technical note's formulas, compared with the benchmark aggregated to Table-2 macro accounts (margin account verified to consolidate away exactly).
+
+- Cells: 46 (45 KBP-computable, 1 unpublished-input, 2 residual-defined)
+- Exact (<=0.01%): 43/45; within 1%: 45/45; median |dev| 0.0000%; max |dev| 0.1388%
+- Benchmark macro cells not covered by any formula: none
+
+## Largest deviations
+
+| Entry | Cell | Formula | Computed (Rm) | Benchmark (Rm) | Dev % |
+|---|---|---|---|---|---|
+| xvii | (government,enterprises) | +KBP6718J+KBP6759J+KBP6787J | 428,816 | 429,412 | -0.1388 |
+| xxviii | (enterprises,government) | +KBP6715J+KBP6791J | 686,931 | 687,527 | -0.0867 |
+| xli | (labour,row) | +KBP6208J | 12,858 | 12,858 | +0.0037 |
+| xliv | (households,row) | +KBP6912J | 44,829 | 44,830 | -0.0011 |
+| xlii | (capital,row) | +KBP6904J | 110,466 | 110,465 | +0.0009 |
+| xlvi | (si,row) | +KBP6913J | 144,162 | 144,163 | -0.0009 |
+| xiv | (row,capital) | RESIDUAL:iii+xlii-xi-xii-xiii | 248,033 | 248,032 | +0.0004 |
+| xxxiii | (government,atx) | +KBP6600J-KBP6601J | 106,420 | 106,420 | +0.0003 |
+| iv | (atx,activities) | +KBP6600J-KBP6601J | 106,420 | 106,420 | +0.0003 |
+| xxxvii | (commodities,dstk) | +KBP6010J+KBP6011J | 24,451 | 24,451 | -0.0002 |
+
+## Cost of the unpublished input (public-replication scenario)
+
+Replacing the unpublished customs figure with the public proxy KBP4590J changes these cells:
+
+- vi (stx,commodities): as-built +0.000% -> proxy -1.514%
+- vii (mtx,commodities): as-built +0.000% -> proxy +16.085%
+- xxxiv (government,stx): as-built +0.000% -> proxy -1.514%
+- xxxv (government,mtx): as-built +0.000% -> proxy +16.085%
+
+Full table: macro_sam_construction.csv.

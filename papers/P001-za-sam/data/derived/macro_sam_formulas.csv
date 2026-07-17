@@ -1,0 +1,47 @@
+entry,row_account,col_account,formula,tn_value_rbn,note
+i,commodities,activities,+KBP6871J,5992,Intermediate consumption; disaggregated by 2019 UT
+ii,labour,activities,+KBP6000J,2732,Compensation of employees; split to 10 occupations via LMD 2018+2019
+iii,capital,activities,+KBP6001J+KBP6002J,2206,Net operating surplus + depreciation; split to 6 capital types via AFS 2019
+iv,atx,activities,+KBP6600J-KBP6601J,106,Other taxes less subsidies on production
+v,activities,commodities,+KBP6870J,11037,Output of total domestic economy; equals sum of i-iv
+vi,stx,commodities,+KBP6603J-KBP6604J-vii,520,Product taxes less subsidies less import duties; TN cites KBP4590J but the benchmark subtracts its unpublished customs figure (entry vii)
+vii,mtx,commodities,UNPUBLISHED,49,Customs duties collected; unpublished Stats SA data - public replication limit
+viii,row,commodities,+KBP6014J,1502,Imports of goods & services
+ix,households,labour,+KBP6240J,2730,Compensation of residents; split by LCS 2015 + LMD occupation-education map
+x,row,labour,RESIDUAL:ii+xli-ix,15,Compensation of SA employees abroad (KBP6207J cited); computed as residual
+xi,enterprises,capital,+KBP6706J+KBP6746J+KBP6904J-KBP6901J,1402,GOS of financial + non-financial corporations adjusted for RoW property income
+xii,households,capital,+KBP6826J,542,GOS / mixed income of households and NPISHs
+xiii,government,capital,+KBP6786J,124,GOS of general government
+xiv,row,capital,RESIDUAL:iii+xlii-xi-xii-xiii,248,Property income received from RoW (KBP6901J cited); computed as residual
+xv,enterprises,enterprises,-KBP6707J+KBP6710J-KBP6747J+KBP6752J+KBP6716J,858,Intra-corporate property income and transfers; TN prose signs are garbled - this signed combination is the unique one (over coefficients in {-1;0;1}) reproducing the benchmark exactly; KBP6720J unused
+xvi,households,enterprises,+KBP6721J+KBP6762J+KBP6827J+KBP6838J+KBP6845J,1190,Property income and transfers to households; LCS 2015 shares
+xvii,government,enterprises,+KBP6718J+KBP6759J+KBP6787J,429,Social benefits/contributions + property income to government; -R596m vs benchmark; vintage hypothesis tested and refuted (June 2022 = Dec 2022 values) - an undocumented symmetric adjustment in the benchmark (see xxviii)
+xviii,dtx,enterprises,+KBP6717J+KBP6758J,238,Corporate income taxes
+xix,si,enterprises,+KBP6724J+KBP6725J+KBP6764J+KBP6765J,692,Corporate saving + residuals
+xx,row,enterprises,+KBP6918J+KBP6919J,15,Non-life insurance flows with RoW
+xxi,commodities,households,+KBP6007J,3589,Household final consumption; 2019 UT product shares x LCS 2015 class shares
+xxii,enterprises,households,+KBP6832J+KBP6842J,460,Property income paid + net non-life premiums by households
+xxiii,government,households,+KBP6797J+KBP6840J,454,Transfers + social contributions paid by households
+xxiv,dtx,households,+KBP6245J,536,Household income taxes; LCS 2015 tax-outlay shares
+xxv,si,households,+KBP6846J+KBP6848J,97,Household saving + residual
+xxvi,row,households,+KBP6909J,31,Miscellaneous transfers received from RoW... paid to RoW per TN placement
+xxvii,commodities,government,+KBP6008J,1104,Government final consumption; 2019 UT shares
+xxviii,enterprises,government,+KBP6715J+KBP6791J,688,Social contributions received by corporations + gov property income paid; -R596m vs benchmark - same gap as xvii; +596 added to both directions of gvt-ent flows keeps both accounts balanced: the signature of a manual balancing adjustment; undocumented in the TN
+xxix,households,government,+KBP6801J+KBP6836J,660,Transfers + social benefits to households; LCS 2015 grant shares
+xxx,government,government,+KBP6794J+KBP6798J,265,Intra-government social contributions and benefits
+xxxi,si,government,+KBP6803J,-44,Government gross saving (dissaving in 2019)
+xxxii,row,government,+KBP6908J,50,Current international co-operation received
+xxxiii,government,atx,+KBP6600J-KBP6601J,106,Production taxes passed to government
+xxxiv,government,stx,+KBP6603J-KBP6604J-vii,512,Product taxes passed to government; TN prints 512 (the pure-KBP4590J variant) vs 520 in vi (the as-built value) - the benchmark uses the unpublished customs figure
+xxxv,government,mtx,+vii,57,Import duties passed to government; equals the unpublished customs figure; KBP4590J (public proxy) differs by +16%
+xxxvi,government,dtx,+KBP6717J+KBP6758J+KBP6245J,774,Income taxes passed to government; TN text repeats corporate formula - 774 = xviii + xxiv
+xxxvii,commodities,dstk,+KBP6010J+KBP6011J,24,Change in inventories + residual item; 2019 UT shares
+xxxviii,commodities,si,+KBP6009J,865,Gross fixed capital formation; 2019 UT shares
+xxxix,dstk,si,+KBP6010J+KBP6011J,24,Inventory change financed from accumulation
+xl,commodities,row,+KBP6013J,1532,Exports of goods & services; 2019 UT shares
+xli,labour,row,+KBP6208J,13,Compensation of SA residents earned in RoW
+xlii,capital,row,+KBP6904J,110,Property income paid by RoW to domestic capital
+xliii,enterprises,row,+KBP6934J+KBP6935J,15,Non-life insurance flows from RoW to enterprises
+xliv,households,row,+KBP6912J,45,Miscellaneous transfers from RoW to households
+xlv,government,row,+KBP6911J,1,Current international co-operation paid to government
+xlvi,si,row,+KBP6913J,144,Current external balance financing domestic accumulation

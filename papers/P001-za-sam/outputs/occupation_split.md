@@ -1,0 +1,8 @@
+# Occupation disaggregation report
+
+Generated 2026-07-16 by code/08_split_occupations.py.
+
+- Table A2: 160 descriptions parsed; unmatched LMD labels: 0
+- Share agreement vs benchmark (10 occupations x 61 activities): n=610  median 0.0378pp  mean 0.8610pp  max 24.40pp  within 1pp 88.7%
+
+Full table: occupation_split.csv. Only aggregated shares are published; LMD microdata are not redistributed.

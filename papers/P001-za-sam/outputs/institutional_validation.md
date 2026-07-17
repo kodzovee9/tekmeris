@@ -1,0 +1,35 @@
+# Institutional-block validation report
+
+Generated 2026-07-16 by code/05_validate_institutional_block.py.
+
+## Final demand: SUT categories vs SAM institutional spending
+
+| Category | SUT (Rm) | SAM (Rm) | Gap (Rm) | Commodities exact |
+|---|---|---|---|---|
+| Households | 3,588,896 | 3,588,896 | +0 | 93/93 |
+| General government | 1,104,496 | 1,104,496 | +0 | 3/3 |
+| Exports | 1,532,389 | 1,532,389 | +0 | 97/97 |
+| Fixed capital formation | 865,499 | 865,499 | +0 | 21/21 |
+| Changes in inventories + Residual | 24,451 | 24,451 | -0 | 102/102 |
+
+### Largest commodity-level gaps per category
+
+
+## The macro-SAM (kind x kind, R'million)
+
+Rows receive, columns pay. Full table: macro_sam_by_kind.csv.
+
+| receives \\ pays | activity | commodity | margin | factor | enterpris | household | governmen | tax | savings_i | rest_of_w |
+|---|---|---|---|---|---|---|---|---|---|---|
+| activity |  | 11,036,678 |  |  |  |  |  |  |  |  |
+| commodity | 5,991,752 |  | 871,302 |  |  | 3,588,896 | 1,104,496 |  | 889,950 | 1,532,389 |
+| margin |  | 871,302 |  |  |  |  |  |  |  |  |
+| factor | 4,938,506 |  |  |  |  |  |  |  |  | 123,322 |
+| enterprise |  |  |  | 1,401,773 | 857,644 | 460,282 | 687,527 |  |  | 14,929 |
+| household |  |  |  | 3,272,377 | 1,190,240 |  | 659,704 |  |  | 44,830 |
+| government |  |  |  | 124,439 | 429,412 | 453,918 | 265,177 | 1,449,017 |  | 968 |
+| tax | 106,420 | 568,739 |  |  | 237,566 | 536,292 |  |  |  |  |
+| savings_investment |  |  |  |  | 692,364 | 97,178 | -43,755 |  | 24,451 | 144,163 |
+| rest_of_world |  | 1,502,065 |  | 263,240 | 14,929 | 30,585 | 49,782 |  |  |  |
+
+Reading guide: factor rows are paid by activities (value added) and pay households/enterprises (income distribution); government is paid by taxes and pays commodities (consumption) and households (transfers); savings_investment collects savings and pays commodities (investment).

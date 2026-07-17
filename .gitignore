@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.DS_Store
+papers/*/data/external/
+toolkit/recipes/build/data/
+toolkit/recipes/build/output/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc

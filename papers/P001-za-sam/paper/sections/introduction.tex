@@ -1,0 +1,121 @@
+\section{Introduction}\label{sec:intro}
+
+Social accounting matrices organise an economy's transactions---production,
+factor incomes, institutional transfers, accumulation, and external
+flows---into a single square array in which every account's receipts equal
+its payments. They are the standard database for multiplier analysis and
+computable general equilibrium modelling, and in many countries they are the
+principal quantitative bridge between official statistics and policy
+simulation.
+
+Yet SAM construction has a reproducibility problem. The way matrices are
+built has changed remarkably little since \citet{pyattround1985}:
+heterogeneous official tables are reconciled through long chains of
+spreadsheet operations, expert judgments, and balancing passes that are
+rarely documented at the level where they act---the individual cell. The
+consequences are familiar to every practitioner: published SAMs are trusted
+and used, but they can seldom be reproduced, audited, or updated by anyone
+other than their authors; knowledge of how a matrix was actually built
+leaves when its builder does; and each new country or benchmark year
+restarts the work nearly from scratch. Section~\ref{sec:related} argues
+that this is a property of the prevailing \emph{medium}---prose describing
+spreadsheets---rather than of any particular team.
+
+This paper demonstrates that the problem is unnecessary: SAM construction
+can move from an opaque artisanal exercise to an auditable, executable
+statistical-production process. We introduce a construction and audit
+framework with four commitments: every source file is fingerprinted and
+registered; every classification, concordance, and cell formula is
+machine-readable and reviewable; every balancing adjustment is logged at
+the cell where it acts; and the accounting identities that define a SAM
+are enforced as executable checks rather than assumed. We then apply the
+framework end to end, building a complete 2019 SAM for South Africa from
+publicly obtainable official sources and access-controlled survey
+microdata---inputs available to any researcher at no cost, with no
+privileged access\footnote{``Publicly obtainable'' means: published
+statistical releases plus survey microdata obtainable by any registered
+researcher under DataFirst's standard access conditions. The one input
+that is not obtainable at all---the benchmark's unpublished customs
+figure---is treated separately and priced
+(Section~\ref{sec:results:macro}); the \emph{public-proxy} scenario of
+our SAM uses published sources only.}---and auditing it, cell by cell,
+against the strongest available benchmark: the 2019 South African SAM
+published by UNU-WIDER \citep{vanseventer2023}, which is unusually well
+documented by the standards of the genre and ships with a technical note
+mapping its macro structure to South African Reserve Bank (SARB)
+national-accounts series.
+
+South Africa is the evidence, not the point. The audit produces three kinds
+of result that we argue generalise. First, \emph{exact replication where
+the sources allow it}: the benchmark's entire production and commodity
+side reproduces from the official supply and use tables to within
+R0.5~million on all 61 activities and all commodities, and 43 of 45
+computable institutional macro cells match the SARB series exactly
+(Table~\ref{tab:headline} summarises). Second, \emph{numerical recovery of
+undocumented choices}: where the benchmark's documentation is silent or
+mistaken, the data identify what was actually done---the edition and
+measure behind its capital-stock split, the unique sign structure of a
+misprinted aggregation formula, and the household grouping variable.
+Third, \emph{a priced replicability boundary}: the benchmark rests on
+exactly one non-public input, and substituting its public proxy changes
+import duties by $+16.1$ per cent and product taxes by $-1.5$ per cent; a
+small unrecorded balancing adjustment and a handful of sector-level share
+edits are likewise isolated and bounded.
+
+Two further applications then place South Africa on a spectrum, and the
+three-country design is deliberately asymmetric: one deep audit, one
+data-boundary test, one transfer-and-generation demonstration. The
+applications are not three comparable country studies---each answers a
+different question about the same framework under a different publication
+regime, and their unequal depth is the research design, not uneven
+execution. Applied to Kenya---where the machine-readable supply--use
+detail behind IFPRI's widely used 2019 SAM is not published---the
+framework verifies the matrix's structure and macro controls against the
+national accounts and locates exactly where verification must stop: the
+published accounts carry a statistical discrepancy of 3.6~per~cent of
+GDP, a balanced SAM cannot carry one, and the deviation pattern is
+consistent with the discrepancy being absorbed primarily through the
+consumption and trade aggregates. Applied to the Netherlands---where
+harmonised tables are a public API---the framework needs no benchmark at
+all: three API calls, a 70-line reader, and one script generate a 2019
+macro accounting matrix whose inputs pass every identity exactly and
+whose residuals are each attributed to a named ESA boundary item, and a
+logged balancing step then closes it into a macro SAM
+(Section~\ref{sec:applications}).
+
+Our contribution is therefore not a new balancing estimator---the
+mathematics of biproportional (RAS) and cross-entropy adjustment is settled
+\citep{robinson2001,temurshoev2013}---but a demonstration, on a full-scale
+national SAM, of five things at once: a reproducible construction pipeline;
+an audit methodology whose discrepancies are detected by
+\emph{deterministic reconciliation against accounting identities} rather
+than by reading documentation; a reconstruction of a published national SAM
+from publicly obtainable sources with every departure disclosed and
+quantified; a
+taxonomy of the ways documentation and data diverge in even the
+best-documented matrices; and an open toolkit---readers for supply--use,
+SAM, central-bank, and survey sources; concordance and account-taxonomy
+machinery; RAS balancing with mandatory diagnostics; a generator for
+workbooks whose totals and balance checks are live formulas---offered as
+reproducible infrastructure for official SAM construction and released
+with the replication package.\footnote{The toolkit (\texttt{edikit}) and
+all scripts, registries, and derived tables are part of the replication
+package; see the Reproducibility and AI disclosure section.} The framework
+doubles as a practical construction workflow: the pipeline generates and
+balances the matrix mechanically, so that scarce expert time is spent only
+on the residual cells that identities cannot determine
+(Section~\ref{sec:discussion:workflow}).
+
+The idea the paper keeps returning to is simple: \emph{cell-level
+provenance and machine-readable construction rules, published alongside
+every SAM, would make such audits---and such SAMs---routine.} The paper
+proceeds as follows. Section~\ref{sec:related} situates the work and
+contrasts the prevailing construction workflow with the framework's.
+Section~\ref{sec:data} describes the source registry.
+Section~\ref{sec:method} sets out the pipeline and the audit method.
+Section~\ref{sec:results} reports the South African replication block by
+block. Section~\ref{sec:applications} presents the Kenyan and Dutch
+applications and the replicability spectrum they trace.
+Section~\ref{sec:discussion} draws out the taxonomy, the construction
+workflow, and implications for statistical practice, and
+Section~\ref{sec:conclusion} concludes.
