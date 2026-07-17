@@ -35,6 +35,32 @@ research papers built on it.
   validation reports, and the manuscript. Appendix E of the paper maps
   every claim to the script that produces it.
 
+## Reviewer pathway (five minutes, no network needed)
+
+```bash
+git clone https://github.com/kodzovee9/tekmeris && cd tekmeris
+pip install -e "./toolkit[dev]"
+pytest toolkit/tests -q          # expected: 23 passed
+cd papers/P001-za-sam/code
+python 15_netherlands_generate.py
+```
+
+The Dutch generation runs entirely from data committed in this
+repository (three registered Eurostat JSON responses). A successful run
+prints:
+
+```
+industries 65/65; products 65; identity findings 0; cross-diffs 0; commodity closure 65/65
+macro matrix: 18 accounts, GDP(bp) EUR 724,960m
+...
+balanced SAM: converged=True in 418 its; max residual EUR 0.009m; max |factor-1| 2.82%
+```
+
+and regenerates `outputs/netherlands_generation.md` and the two matrix
+CSVs byte-for-byte. For a networked demonstration on a country of your
+choice: `cd toolkit/recipes/build && python build_sam.py --country AT
+--year 2019`.
+
 ## Data availability
 
 Raw inputs whose licences permit redistribution are committed under

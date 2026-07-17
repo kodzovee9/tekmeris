@@ -9,15 +9,19 @@ python build_sam.py --country AT --year 2019
 
 That fetches Austria's 2019 supply table, use table, and non-financial
 sector accounts from the Eurostat dissemination API (three requests,
-~200KB, cached in `data/`), generates an 18-account macro SAM, and writes
-two files to `output/`:
+~200KB, cached in `data/`), generates an 18-account macro accounting matrix, balances it, and writes
+three files to `output/`:
 
-- `AT_2019_macro_sam.csv` — the matrix in long form (row, col, EUR million)
+- `AT_2019_macro_sam.csv` — the pre-balancing matrix in long form
+  (row, col, EUR million), with every account residual attributed in the
+  report
+- `AT_2019_macro_sam_balanced.csv` — the balanced macro SAM, carrying the
+  RAS adjustment factor of every cell
 - `AT_2019_generation.md` — the validation report
 
 It works for any country and year in the ESA 2010 transmission programme
 (the EU members plus several others — roughly 30 countries, most years
-from 2010 on). Requires Python 3.10+; no packages beyond the standard
+from 2010 on). Requires Python 3.11+; no packages beyond the standard
 library and `edikit` (this repository, no install needed — the script
 finds it relatively). If the download fails with an SSL certificate
 error (common with macOS framework Python), `pip install certifi` and
