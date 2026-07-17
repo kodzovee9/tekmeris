@@ -9,6 +9,7 @@ version: 0.1.0
 date-released: 2026-07-17
 license: Apache-2.0
 repository-code: "https://github.com/kodzovee9/tekmeris"
+doi: 10.5281/zenodo.21419196
 preferred-citation:
   type: unpublished
   authors:

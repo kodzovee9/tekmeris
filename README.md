@@ -1,5 +1,7 @@
 # Tekmeris
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21419196.svg)](https://doi.org/10.5281/zenodo.21419196)
+
 Reproducible construction and auditing of social accounting matrices
 (SAMs) from official statistics: an open toolkit (**edikit**) and the
 research papers built on it.
