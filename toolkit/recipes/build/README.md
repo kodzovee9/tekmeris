@@ -19,9 +19,12 @@ three files to `output/`:
   RAS adjustment factor of every cell
 - `AT_2019_generation.md` — the validation report
 
-It works for any country and year in the ESA 2010 transmission programme
-(the EU members plus several others — roughly 30 countries, most years
-from 2010 on). Requires Python 3.11+; no packages beyond the standard
+The harmonised workflow is designed for countries in the ESA 2010
+transmission programme with the required Eurostat tables. The committed
+[COVERAGE.md](COVERAGE.md) records a full sweep of 37 candidate
+countries for 2019 — which generate and balance cleanly, which carry
+diagnostics needing review, and which the datasets do not cover —
+regenerate it with `python sweep.py`. Requires Python 3.11+; no packages beyond the standard
 library and `edikit` (this repository, no install needed — the script
 finds it relatively). If the download fails with an SSL certificate
 error (common with macOS framework Python), `pip install certifi` and

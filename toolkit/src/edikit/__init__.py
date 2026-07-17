@@ -7,4 +7,4 @@ pipeline (end-to-end generation and audit); forecast, benchmark, and
 decide are roadmap stubs that gain content only when a paper needs them.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"

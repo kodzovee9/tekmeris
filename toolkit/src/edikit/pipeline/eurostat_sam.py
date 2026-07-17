@@ -93,6 +93,11 @@ def partition(codes: list[str]) -> list[str]:
                 contained = True      # a whole-section code also present
             elif ddivs is not None and divs is not None and divs < ddivs:
                 contained = True
+            elif (ddivs is not None and divs is not None and divs == ddivs
+                  and len(c) > len(d)):
+                # equal coverage at two granularities (e.g. L68 alongside
+                # L68A/L68B): keep the coarser code, drop the suffixed one
+                contained = True
         if not contained:
             out.append(c)
     return out
@@ -174,18 +179,25 @@ def generate(country: str, year: int,
     prods = partition([p for p in sup.categories["prd_amo"]
                        if p.startswith("CPA_") and p != "CPA_TOTAL"
                        and p in pop_prods])
+    if not inds or not prods:
+        raise ValueError(f"{country} {year}: no supply-table data returned "
+                         f"(the dataset does not cover this country-year)")
     tot_ind = sum(scells.get(("TOTAL", p), 0.0) for p in prods)
     tiled = sum(scells.get((i, p), 0.0) for i in inds for p in prods)
-    # overcounting means the partition double-counts - always a bug;
-    # undercounting means suppressed/confidential cells - a property of
-    # the source, recorded as coverage and reported
-    assert tiled - tot_ind <= max(1.0, 1e-6 * tot_ind), \
+    # gross overcounting means the partition double-counts - a bug;
+    # small excesses occur where a source's own detail disagrees with its
+    # published TOTAL column (e.g. Denmark 2019, +1.7%), and undercounts
+    # mean suppressed cells - both are source properties, recorded as
+    # coverage diagnostics, and the macro cells anchor to published totals
+    assert tiled - tot_ind <= max(0.05 * tot_ind, 1.0), \
         f"industry partition double-counts: {tiled:,.0f} vs {tot_ind:,.0f}"
     missing = [i for i in inds if i not in use.categories["ind_use"]]
     assert not missing, f"industries absent from use table: {missing}"
     uinds = inds
 
     coverage: dict[str, float] = {}
+    if abs(tiled - tot_ind) > max(1.0, 1e-6 * tot_ind):
+        coverage["industry detail vs published supply total"] = tiled / tot_ind
 
     def pub_or_leaf(name: str, published: float | None, leaf: float,
                     tol: float = 1.0) -> float:
@@ -377,8 +389,21 @@ def balance(res: MacroSAMResult, targets: str = "mean",
     return ras(seed, t, dict(t)), flipped
 
 
-def write_report(res: MacroSAMResult, path: str | Path) -> None:
-    """Generic markdown validation report for one generated macro SAM."""
+def write_balanced_csv(bal: BalanceResult, path: str | Path) -> None:
+    """Balanced matrix in long form, carrying the RAS adjustment factor
+    of every cell."""
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["row", "col", "value_EURm", "ras_factor"])
+        for (r, c), v in sorted(bal.matrix.items()):
+            w.writerow([r, c, f"{v:.1f}", f"{bal.factors.get((r, c), 1.0):.6f}"])
+
+
+def write_report(res: MacroSAMResult, path: str | Path,
+                 balance: BalanceResult | None = None,
+                 flipped: list[tuple[str, str]] | None = None) -> None:
+    """Generic markdown validation report for one generated macro SAM;
+    pass `balance` (and `flipped`) to append the balancing diagnostics."""
     with open(path, "w") as f:
         f.write(f"# {res.country} {res.year}: benchmark-free macro-SAM "
                 f"generation\n\nGenerated {date.today()} by "
@@ -398,8 +423,10 @@ def write_report(res: MacroSAMResult, path: str | Path) -> None:
                 f"products within EUR 1m; largest residual EUR "
                 f"{max(abs(v) for v in res.prod_resid.values()):,.0f}m\n")
         if res.coverage:
-            f.write("- Suppressed detail (macro cells use the published "
-                    "totals; the leaf detail covers):\n")
+            f.write("- Leaf detail vs published totals (macro cells use "
+                    "the published totals; below 100% = suppressed cells, "
+                    "above 100% = the source's own detail exceeds its "
+                    "published total):\n")
             for name, cov in sorted(res.coverage.items()):
                 f.write(f"  - {name}: {cov * 100:.1f}%\n")
             f.write("- Note: identity findings above may reflect the same "
@@ -419,6 +446,21 @@ def write_report(res: MacroSAMResult, path: str | Path) -> None:
                 "compensation, mixed-income attribution, capital-account "
                 "detail). Inspect any account above a few percent of GDP "
                 "before use.\n")
+        if balance is not None:
+            f.write("\n## Balanced macro SAM\n\n")
+            if flipped:
+                f.write("- Negative cells flipped to their positive "
+                        "transpose before balancing: "
+                        + ", ".join(f"({r},{c})" for r, c in flipped) + "\n")
+            f.write(f"- RAS against account targets = mean(receipts, "
+                    f"payments): converged={balance.converged} in "
+                    f"{balance.iterations} iterations; max residual EUR "
+                    f"{max(balance.max_row_gap, balance.max_col_gap):.3f}m\n")
+            fs = sorted(balance.factors.values())
+            f.write(f"- Adjustment factors: {len(fs)} cells in "
+                    f"[{fs[0]:.4f}, {fs[-1]:.4f}] (max |f-1| = "
+                    f"{balance.max_factor_deviation() * 100:.2f}%); every "
+                    f"factor ships in the balanced CSV\n")
 
 
 def write_csv(res: MacroSAMResult, path: str | Path) -> None:

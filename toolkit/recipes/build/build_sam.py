@@ -5,14 +5,16 @@
 
 fetches the country's supply table, use table, and sector accounts from
 the Eurostat dissemination API (three requests, reused if already on
-disk), generates a macro SAM with no benchmark consulted, and writes:
+disk), generates a macro accounting matrix with no benchmark consulted,
+balances it, and writes:
 
-    output/<COUNTRY>_<YEAR>_macro_sam.csv    the matrix (row, col, EURm)
-    output/<COUNTRY>_<YEAR>_generation.md    the validation report
+    output/<COUNTRY>_<YEAR>_macro_sam.csv           pre-balancing matrix
+    output/<COUNTRY>_<YEAR>_macro_sam_balanced.csv  balanced SAM + RAS factors
+    output/<COUNTRY>_<YEAR>_generation.md           the validation report
 
-Every accounting-identity check and every account residual is in the
-report; nothing is balanced away silently. See README.md for what the
-checks mean and how to adapt the kit beyond the Eurostat universe.
+Every accounting-identity check, account residual, and balancing factor
+is on the record; nothing is adjusted silently. See README.md for what
+the checks mean and how to adapt the kit beyond the Eurostat universe.
 """
 
 import argparse
@@ -40,15 +42,11 @@ def main() -> None:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
     stem = f"{args.country}_{args.year}"
-    eurostat_sam.write_csv(res, out / f"{stem}_macro_sam.csv")
-    eurostat_sam.write_report(res, out / f"{stem}_generation.md")
     bal, flipped = eurostat_sam.balance(res)
-    with open(out / f"{stem}_macro_sam_balanced.csv", "w", newline="") as f:
-        import csv
-        w = csv.writer(f)
-        w.writerow(["row", "col", "value_EURm", "ras_factor"])
-        for (r, c), v in sorted(bal.matrix.items()):
-            w.writerow([r, c, f"{v:.1f}", f"{bal.factors.get((r, c), 1.0):.6f}"])
+    eurostat_sam.write_csv(res, out / f"{stem}_macro_sam.csv")
+    eurostat_sam.write_balanced_csv(bal, out / f"{stem}_macro_sam_balanced.csv")
+    eurostat_sam.write_report(res, out / f"{stem}_generation.md",
+                              balance=bal, flipped=flipped)
 
     print(f"industries {len(res.inds)}; products {len(res.prods)}; "
           f"identity findings {len(res.findings)}; "

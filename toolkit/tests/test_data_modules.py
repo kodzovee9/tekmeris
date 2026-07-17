@@ -441,6 +441,15 @@ def test_eurostat_generate_and_balance_on_synthetic_economy(tmp_path):
     assert bal.converged and not flipped
     assert max(bal.max_row_gap, bal.max_col_gap) < 1e-6
     assert bal.max_factor_deviation() < 1e-9   # nothing to adjust
+    # the writers: report with balancing section, balanced CSV with factors
+    from edikit.pipeline.eurostat_sam import write_balanced_csv, write_report
+    write_report(res, tmp_path / "r.md", balance=bal, flipped=flipped)
+    text = (tmp_path / "r.md").read_text()
+    assert "Balanced macro SAM" in text and "converged=True" in text
+    write_balanced_csv(bal, tmp_path / "b.csv")
+    lines = (tmp_path / "b.csv").read_text().splitlines()
+    assert lines[0] == "row,col,value_EURm,ras_factor"
+    assert len(lines) == len(bal.matrix) + 1
 
 
 def test_audit_matrix_reader_kinds_and_controls(tmp_path):
