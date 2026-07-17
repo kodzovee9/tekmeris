@@ -5,11 +5,11 @@ type: software
 authors:
   - family-names: Abalo
     given-names: Kodzovi
-version: 0.1.1
+version: 0.1.2
 date-released: 2026-07-17
 license: Apache-2.0
 repository-code: "https://github.com/kodzovee9/tekmeris"
-doi: 10.5281/zenodo.21419780
+doi: 10.5281/zenodo.21420120
 preferred-citation:
   type: unpublished
   authors:
