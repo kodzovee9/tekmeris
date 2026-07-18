@@ -1,18 +1,23 @@
 # Toolkit
 
-The shared Python package (`edikit`, a working name) that accumulates across papers. Modules exist only when a paper needed them — nothing is built speculatively.
+`edikit` — a Python package for reproducible construction and auditing of
+national social accounting matrices from official statistics. Modules
+exist only when a paper needed them — nothing is built speculatively.
 
-## Module map (mirrors the five dimensions)
+## Implemented modules
 
-| Module | Tag | First expected contributor |
-| --- | --- | --- |
-| `edikit.data` | data | P001 — source registry, ingestion, concordances, provenance |
-| `edikit.model` | model | P001/P002/P003 — SAM assembly, balancing (RAS/GRAS/cross-entropy), multipliers, IO updating |
-| `edikit.forecast` | forecast | vintage logging (standing task), later P006 |
-| `edikit.benchmark` | benchmark | P002 — rankings with uncertainty bands |
-| `edikit.decide` | decide | P005+ — scenario comparison, trade-off reporting |
-| `edikit.report` | cross-cutting | P001 — transparent Excel workbook generation, validation reports |
-| `edikit.pipeline` | cross-cutting | end-to-end generators; `eurostat_sam` builds a validated macro SAM for any ESA-transmitting country |
+| Module | Role |
+| --- | --- |
+| `edikit.data` | source readers with accounting-identity checks on ingestion (SUT workbooks, SAM matrices, central-bank series, Eurostat JSON-stat, concordances) |
+| `edikit.model` | account taxonomy with coverage assertions; RAS balancing with per-cell factor diagnostics |
+| `edikit.report` | Excel workbooks whose totals and balance checks are live formulas |
+| `edikit.pipeline` | end-to-end generation (`eurostat_sam`, for covered ESA country-years — see [recipes/build/COVERAGE.md](recipes/build/COVERAGE.md)) and auditing (`audit`) |
+
+## Roadmap stubs (empty packages, not yet implemented)
+
+`edikit.forecast` (vintage logging, later P006), `edikit.benchmark`
+(P002 — rankings with uncertainty bands), `edikit.decide` (P005+ —
+scenario comparison). They gain content only when a paper needs them.
 
 ## Recipes
 

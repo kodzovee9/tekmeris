@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-"""Build a validated macro SAM for any ESA-transmitting country.
+"""Build a validated macro SAM for a covered ESA country-year.
+
+See COVERAGE.md for which country-years the Eurostat datasets support.
 
     python build_sam.py --country AT --year 2019
 

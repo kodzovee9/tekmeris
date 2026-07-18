@@ -52,9 +52,20 @@ def main() -> None:
             worst = max(abs(v) for v in res.imbalances.values()) / res.gdp * 100
             supp = (f"; detail suppressed ({min(res.coverage.values()) * 100:.0f}"
                     f"% worst aggregate)" if res.coverage else "")
-            # 'ok' requires economically sane residuals before balancing;
-            # otherwise flag for review (factors are reported either way)
-            status = "ok" if worst <= 5.0 else "review"
+            # five-tier classification, aligned with the toolkit's own
+            # concept of executable checks:
+            #   passes-core-checks: every accounting diagnostic clean
+            #   generates-with-caveats: builds and balances, but carries
+            #     identity/closure/cross-check/suppression findings
+            #   requires-review: large residuals or extreme factors
+            if worst > 5.0 or bal.max_factor_deviation() > 1.0:
+                status = "requires-review"
+            elif (res.findings or res.cross_diffs or res.coverage
+                  or res.n_closed < len(res.prods) or res.n3_check > 1.0
+                  or not bal.converged):
+                status = "generates-with-caveats"
+            else:
+                status = "passes-core-checks"
             rows.append((cc, status,
                          f"{len(res.inds)} industries; "
                          f"{len(res.findings)} identity findings; "
@@ -74,21 +85,34 @@ def main() -> None:
                              f"{worst:.1f}% GDP); balancing infeasible - "
                              f"{reason}"))
                 print(f"{cc}: partial - {reason}")
+            elif "no supply-table data" in str(e) or (
+                    res is not None and res.gdp <= 0):
+                detail = (reason if res is None else
+                          "required use-table or sector-account rows are "
+                          "empty (GDP evaluates to zero)")
+                rows.append((cc, "unavailable", detail))
+                print(f"{cc}: unavailable")
             else:
                 rows.append((cc, "fail", reason))
                 print(f"{cc}: FAIL - {reason}")
 
-    ok = sum(1 for _, st, _ in rows if st == "ok")
-    review = sum(1 for _, st, _ in rows if st == "review")
-    partial = sum(1 for _, st, _ in rows if st == "partial")
+    tiers = ["passes-core-checks", "generates-with-caveats",
+             "requires-review", "partial", "unavailable", "fail"]
+    n = {t: sum(1 for _, st, _ in rows if st == t) for t in tiers}
     with open(args.out, "w") as f:
         f.write(f"# Country coverage, {args.year}\n\nGenerated {date.today()} "
-                f"by recipes/build/sweep.py: {ok} of {len(rows)} candidate "
-                f"countries generate and balance with clean diagnostics"
-                + (f"; {review} generate and balance but carry diagnostics "
-                   f"needing review" if review else "")
-                + (f"; {partial} generate but cannot be balanced "
-                   f"from one-sided sector accounts" if partial else "")
+                f"by recipes/build/sweep.py over {len(rows)} candidate "
+                f"countries: {n['passes-core-checks']} pass every core check "
+                f"(zero identity findings, full commodity closure, no "
+                f"cross-table differences, import identity within tolerance, "
+                f"no suppression, converged balancing, worst residual within "
+                f"5% of GDP); {n['generates-with-caveats']} generate and "
+                f"balance with documented caveats; {n['requires-review']} "
+                f"carry large residuals or extreme factors and require "
+                f"review; {n['partial']} generate but cannot be balanced; "
+                f"{n['unavailable']} country-years are not covered by the "
+                f"datasets"
+                + (f"; {n['fail']} fail otherwise" if n['fail'] else "")
                 + ".\n\n"
                 f"| Country | Outcome | Detail |\n|---|---|---|\n")
         for cc, st, detail in rows:
@@ -97,7 +121,8 @@ def main() -> None:
                 "requested year (missing datasets, vintages, or units), "
                 "recorded here rather than hidden; rerun the sweep to "
                 "regenerate this table.\n")
-    print(f"\n{ok}/{len(rows)} ok; written {args.out}")
+    print("\n" + "; ".join(f"{t}: {n[t]}" for t in tiers if n[t])
+          + f"; written {args.out}")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,10 @@
-"""Benchmark-free macro-SAM generation for any ESA-transmitting country.
+"""Benchmark-free macro-SAM generation for ESA-transmitting countries.
 
 The Eurostat dissemination API serves harmonised supply-use tables
 (naio_10_cp15/16) and non-financial sector accounts (nasa_10_nf_tr) for
-every country in the ESA 2010 transmission programme. Because the item
-codes are harmonised, one generation routine covers them all: fetch(),
+countries in the ESA 2010 transmission programme (coverage varies by
+country-year; the build recipe's COVERAGE.md records a full sweep).
+Because the item codes are harmonised, one routine serves them: fetch(),
 generate(), and the report writers below turn a country code and a year
 into a validated macro SAM with every account residual reported.
 
@@ -199,12 +200,13 @@ def generate(country: str, year: int,
     if abs(tiled - tot_ind) > max(1.0, 1e-6 * tot_ind):
         coverage["industry detail vs published supply total"] = tiled / tot_ind
 
-    def pub_or_leaf(name: str, published: float | None, leaf: float,
-                    tol: float = 1.0) -> float:
+    def pub_or_leaf(name: str, published: float | None, leaf: float) -> float:
         """Prefer the leaf-detail sum when it reproduces the published
-        aggregate (exact accounting); otherwise trust the published cell
-        and record the detail's coverage of it."""
-        if published is None or abs(published - leaf) <= tol:
+        aggregate (within EUR 1m or 0.001 per cent, whichever is larger);
+        otherwise trust the published cell and record the detail's
+        coverage of it."""
+        if published is None or abs(published - leaf) <= max(
+                1.0, 1e-5 * abs(published)):
             return leaf
         if published:
             coverage[name] = leaf / published
@@ -386,7 +388,7 @@ def balance(res: MacroSAMResult, targets: str = "mean",
         # comparable cell by cell
         scale = sum(mean.values()) / sum(base.get(a, 0.0) for a in accounts)
         t = {a: base.get(a, 0.0) * scale for a in accounts}
-    return ras(seed, t, dict(t)), flipped
+    return ras(seed, t, dict(t), max_iter=20000), flipped
 
 
 def write_balanced_csv(bal: BalanceResult, path: str | Path) -> None:

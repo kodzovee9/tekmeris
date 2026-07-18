@@ -21,7 +21,7 @@ research papers built on it.
   |---|---|---|
   | `replicate/` | this repository | every number in the P001 paper |
   | `audit/` | a published SAM | structural audit + macro-controls comparison |
-  | `build/` | a country code | a validated, balanced macro SAM (any ESA-transmitting country) |
+  | `build/` | a country code | a validated, balanced macro SAM (covered ESA country-years — see [COVERAGE.md](toolkit/recipes/build/COVERAGE.md)) |
 
   ```bash
   cd toolkit/recipes/build && python build_sam.py --country AT --year 2019
