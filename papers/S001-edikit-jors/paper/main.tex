@@ -1,0 +1,423 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{setspace}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\onehalfspacing
+
+% Drafted in the JORS software-metapaper structure (Overview /
+% Availability / Reuse potential); to be transferred to the journal's
+% own template at submission.
+
+\title{edikit: A Python Toolkit for Reproducible Construction and
+Auditing of National Social Accounting Matrices}
+\author{Kodzovi Abalo\thanks{World Bank; ORCID
+0000-0002-7567-2181. The views expressed here are those of the author
+and do not necessarily reflect the views of the World Bank, its
+Executive Directors, or the governments they represent.}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+\texttt{edikit} is a small Python library for building and auditing
+national social accounting matrices (SAMs) from official statistics
+under a discipline not yet systematically embedded in commonly
+distributed SAM construction workflows: accounting identities are
+enforced as executable checks at ingestion, classification is never
+inferred silently from labels or code conventions, every balancing
+adjustment is logged at
+the cell where it acts, and every run writes a validation report that
+constitutes the record. The toolkit was developed for, and validated across,
+five countries and three exercise types: a cell-level reconstruction
+and audit of the
+published 2019 South African SAM (production and commodity structure
+reproduced exactly on all 61 activities), a structure-and-macro-controls
+audit of the IFPRI 2019 Kenya SAM, and benchmark-free generation of
+balanced macro SAMs for the Netherlands, Austria, and Poland from the
+Eurostat dissemination API---three HTTP requests per country, one
+command, with confidentiality suppression detected and quantified where
+present. Users enter through three documented recipes---replicate,
+audit, and build---and the package depends only on the standard library
+and \texttt{openpyxl}.
+\end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} social accounting matrix; supply and use
+tables; national accounts; reproducibility; RAS balancing; data
+provenance; Eurostat; Python.
+
+\section{Overview}
+
+\subsection{Introduction}
+
+Social accounting matrices are the standard database for multiplier and
+computable general equilibrium analysis, yet their construction remains
+largely artisanal: heterogeneous official tables are reconciled through
+spreadsheet operations and expert judgments that are rarely documented
+at the level where they act, so published SAMs can seldom be reproduced,
+audited, or updated by anyone other than their authors. The companion
+methods paper \cite{abalo2026} develops this diagnosis through a
+detailed cell-level replication audit of the unusually well documented
+2019 South African SAM of van Seventer and Davies \cite{vanseventer2023}, and
+proposes a remedy: cell-level provenance and machine-readable
+construction rules published alongside every SAM. \texttt{edikit} is the
+reference implementation of that proposal, released so that the remedy
+is a working artefact rather than an exhortation.
+
+The toolkit's design reduces to four commitments. Every source file is
+registered with vintage and hash before use. Accounting identities---for
+each product, supply at purchasers' prices equals basic-price supply
+plus taxes plus margins; for each industry, output equals intermediates
+plus value added; for the matrix, every account's receipts equal its
+payments---are enforced as executable checks the moment data are read,
+not asserted afterwards. Classification is always explicit: account
+codes, labels, and header positions are treated as claims to verify,
+because the audit found them wrong in even the best-documented matrix in
+its class. And adjustment is never silent: the balancing routine returns
+the multiplicative factor of every cell it touches, and refuses inputs
+it cannot handle transparently.
+
+Existing open tooling in the input--output ecosystem concentrates
+primarily on consuming and analysing completed IO and MRIO
+databases---\texttt{pymrio} \cite{stadler2021} is the leading
+example, providing parsers, standardisation, and footprint analytics
+over compiled databases such as EXIOBASE and WIOD. \texttt{edikit}
+addresses an earlier, complementary stage of the pipeline: an integrated
+workflow for \emph{constructing and auditing} a national SAM against
+its underlying official sources. Its distinguishing features are not new
+SAM mathematics---RAS, concordances, and the accounting identities are
+long established---but the integration of executable accounting checks
+at ingestion, explicit and complete account mappings, source-level
+provenance, and cell-specific diagnostics for every balancing
+adjustment into one testable source-to-artefact workflow.
+
+\subsection{Implementation and architecture}
+
+Figure~\ref{fig:arch} shows the workflow the library implements; the
+same stages serve construction and audit, an audit adding a comparison
+target at the reconciliation stage.
+
+\begin{figure}[t]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  stage/.style={draw, rounded corners=2pt, align=center, font=\small,
+                minimum height=2.2em, inner sep=5pt, fill=gray!8},
+  note/.style={font=\scriptsize\itshape, text=gray!60!black, align=center},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[stage] (s1) {1.~Registered\\sources};
+\node[stage, right=0.55cm of s1] (s2) {2.~Verified\\ingestion};
+\node[stage, right=0.55cm of s2] (s3) {3.~Explicit\\classification};
+\node[stage, right=0.55cm of s3] (s4) {4.~Formula \&\\concordance layer};
+\node[stage, below=0.9cm of s4] (s5) {5.~Assembly};
+\node[stage, left=0.55cm of s5] (s6) {6.~Diagnostic\\reconciliation};
+\node[stage, left=0.55cm of s6] (s7) {7.~Logged\\balancing};
+\node[stage, left=0.55cm of s7] (s8) {8.~Reproducible\\artefacts};
+\draw[arr] (s1) -- (s2); \draw[arr] (s2) -- (s3);
+\draw[arr] (s3) -- (s4); \draw[arr] (s4) -- (s5);
+\draw[arr] (s5) -- (s6); \draw[arr] (s6) -- (s7); \draw[arr] (s7) -- (s8);
+\node[note, above=0.12cm of s1] {vintage, hash,\\licence};
+\node[note, above=0.12cm of s2] {identities as\\executable checks};
+\node[note, above=0.12cm of s3] {coverage\\assertions};
+\node[note, below=0.12cm of s6] {vs.\ identities and,\\if any, a benchmark};
+\node[note, below=0.12cm of s7] {every factor\\published};
+\node[note, below=0.12cm of s8] {matrix, reports,\\live workbook};
+\end{tikzpicture}%
+}
+\caption{The workflow \texttt{edikit} implements, from registered
+sources to reproducible artefacts.}
+\label{fig:arch}
+\end{figure}
+
+\texttt{edikit} is pure Python (about 1{,}500 lines in the implemented
+core), organised in four modules with one external dependency
+(\texttt{openpyxl}, for Excel I/O):
+
+\begin{itemize}
+  \item \texttt{edikit.data} --- readers for the source families a SAM
+  build encounters: supply--use workbooks (recomputing every embedded
+  total and enforcing the layout's identities), distributed SAM
+  matrices, central-bank time-series bulk files with a small evaluator
+  for signed series formulas, Eurostat JSON-stat responses (decoding the
+  dissemination API's linear index into code-keyed cells), and
+  concordances with completeness validation.
+  \item \texttt{edikit.model} --- the account taxonomy with coverage
+  assertions (every account classified, nothing phantom; classification
+  is never inferred silently from labels or code conventions---any
+  prefix rules must be explicitly declared, reviewable, and complete,
+  and unmatched accounts raise) and RAS balancing that requires
+  a non-negative seed, verifies target consistency, reports convergence,
+  and returns per-cell adjustment factors as a first-class result.
+  \item \texttt{edikit.report} --- generation of Excel workbooks whose
+  totals and balance checks are live formulas rather than pasted
+  numbers, so a reader can interrogate the artefact in the tool they
+  already use.
+  \item \texttt{edikit.pipeline} --- end-to-end routines:
+  \texttt{eurostat\_sam} (fetch, generate, balance, and report a macro
+  SAM for countries the ESA~2010 transmission datasets cover, including
+  coverage-based classification-tiling assertions and
+  suppressed-detail handling) and \texttt{audit} (structural audit of
+  any distributed SAM, plus macro-aggregate comparison against published
+  national-accounts controls).
+\end{itemize}
+
+Table~\ref{tab:modules} lists the principal public entry points.
+
+\begin{table}[h]
+\centering\small
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+Module & Key callables & Role \\
+\midrule
+\texttt{data.sut} & \texttt{read\_supply\_table}, \texttt{read\_use\_table} & SUT ingestion with identity checks \\
+\texttt{data.sam} & \texttt{read\_labeled\_matrix} & distributed SAM workbooks \\
+\texttt{data.kbp} & \texttt{read\_kbp\_zips}, \texttt{evaluate\_formula} & central-bank series and signed formulas \\
+\texttt{data.eurostat} & \texttt{read\_jsonstat}, \texttt{EurostatTable} & dissemination-API responses \\
+\texttt{data.concordance} & \texttt{Concordance} & mappings with completeness validation \\
+\texttt{model.accounts} & \texttt{AccountSet}, \texttt{AccountKind} & explicit taxonomy, coverage assertions \\
+\texttt{model.balancing} & \texttt{ras}, \texttt{BalanceResult} & RAS with per-cell factor diagnostics \\
+\texttt{report.workbook} & \texttt{add\_matrix\_sheet}, \texttt{add\_table\_sheet} & live-formula Excel artefacts \\
+\texttt{pipeline.eurostat\_sam} & \texttt{fetch}, \texttt{generate}, \texttt{balance} & macro-SAM generation (ESA countries) \\
+\texttt{pipeline.audit} & \texttt{audit}, \texttt{read\_kinds} & structural and macro-controls auditing \\
+\bottomrule
+\end{tabularx}
+\caption{Principal public entry points by module.}
+\label{tab:modules}
+\end{table}
+
+Users enter through three documented \emph{recipes}, thin scripts over
+the library: \texttt{replicate/} regenerates every number in the
+companion paper; \texttt{audit/} audits a published SAM
+(\texttt{python audit\_sam.py -{}-sam matrix.csv -{}-kinds kinds.csv
+-{}-controls controls.csv}); \texttt{build/} generates and balances a
+macro SAM for a country-year (\texttt{python build\_sam.py -{}-country
+AT -{}-year 2019}). Every pipeline run writes a markdown validation report
+recording each identity check, coverage diagnostic, and account
+residual, and---when balancing is invoked---convergence, flipped cells,
+and the adjustment-factor range, with the factor of every individual
+cell in the balanced CSV; the reports, not the console, are the
+record. The
+recipes are thin by design: the same functionality is a five-line
+library call, e.g.
+
+{\small
+\begin{verbatim}
+from edikit.pipeline import eurostat_sam as es
+
+paths = es.fetch("AT", 2019, "data/")     # three cached API requests
+res   = es.generate("AT", 2019, paths)    # identities checked; residuals attributed
+bal, flipped = es.balance(res)            # RAS; every factor in bal.factors
+es.write_report(res, "AT_2019_generation.md",
+                balance=bal, flipped=flipped)
+es.write_balanced_csv(bal, "AT_2019_macro_sam_balanced.csv")
+\end{verbatim}}
+
+\noindent The Dutch case runs entirely offline from three registered
+Eurostat responses committed in the repository, which is the recommended
+first run (the repository README's ``reviewer pathway''). Its validation
+report reads, in excerpt:
+
+{\small
+\begin{verbatim}
+- Output and VA identities: 0 findings at EUR 1m tolerance
+- Commodity balance closure: 65/65 products within EUR 1m
+- GDP at basic prices (generated): EUR 724,960m
+| lab | -4,193 | -0.578% |    | row | -10,830 | -1.494% |
+- RAS [...] converged in 418 iterations; max residual EUR 0.009m
+- Adjustment factors: 70 cells in [0.9832, 1.0282]
+\end{verbatim}}
+
+\subsection{Quality control}
+
+Three layers. First, a \texttt{pytest} suite (23 tests at the tagged
+release) in which the accounting identities are the test cases, covering
+the readers, the classification and tiling machinery, RAS diagnostics,
+the audit pipeline, and end-to-end generation and balancing on a
+synthetic two-industry economy whose identities close exactly; line
+coverage is 91\,per\,cent overall (77--98\,per\,cent per implemented
+module; \texttt{pytest toolkit/tests -{}-cov=toolkit/src/edikit}), and
+a continuous-integration workflow runs the suite on Linux, macOS, and
+Windows across Pythons 3.11--3.13 on every push. Beyond the five
+validation countries, a committed coverage sweep
+(\texttt{recipes/build/sweep.py}) runs the build pipeline across 37
+candidate countries for 2019 and classifies every outcome on the
+toolkit's own terms: 11 pass every core check (zero identity findings,
+full commodity closure, no cross-table differences, import identity
+within tolerance, no suppression, converged balancing, worst residual
+within 5\,per\,cent of GDP); 9 generate and balance with documented
+caveats; 7 carry large residuals or extreme factors and require review;
+2 generate but cannot be balanced from one-sided sector accounts; and 8
+country-years are not covered by the datasets. The archived Zenodo deposit is the snapshot of
+the tagged release this paper describes, and the reviewer pathway's
+expected console output is stated verbatim in the repository README, so
+a successful installation is verifiable in minutes. Second, run-time assertions in every pipeline:
+coverage assertions on classification, tiling assertions on
+category-list partitions, target-consistency checks in balancing. These
+assertions have each caught real errors during development---a survey
+parser that silently dropped an industry with 6{,}202 observations, and
+a double-count from Eurostat's mixed-granularity category lists---which
+the companion paper reports as evidence that the checks bind. Third,
+validation at scale across five countries and three exercise types,
+summarised in Table~\ref{tab:validation}; each run's full validation
+report ships with the repository, and the Polish case demonstrates the
+principal failure mode handled transparently---confidentiality
+suppression is detected by the tiling assertions, quantified per
+aggregate, and reported rather than absorbed.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+Country (2019) & Exercise & Outcome \\
+\midrule
+South Africa & cell-level reconstruction, audited against the published
+UNU-WIDER benchmark & production and commodity structure exact on all 61
+activities and every final-demand category; 43 of 45 computable macro
+cells exact, the remaining two differing by a documented R596m
+reconciling adjustment; the benchmark's single unpublished input
+separately priced \\
+Kenya & structural and macro-controls audit of the IFPRI Nexus SAM &
+structure verified; matrix balanced to its distribution's rounding
+grain; production side within 1\% of published controls \\
+Netherlands & benchmark-free generation and balancing & zero identity
+findings (65/65 industries and products); all residuals attributed,
+each $\leq$1.5\% of GDP; balanced to $<$EUR~0.01m with factors in
+$[0.983, 1.028]$ \\
+Austria & unchanged transfer run & zero identity findings; residuals
+$\leq$0.6\% of GDP \\
+Poland & suppression stress test & withheld cells detected (leaf detail
+covers 96.7\% of gross output); macro accounts anchored to published
+totals; residuals $\leq$1.1\% of GDP \\
+\bottomrule
+\end{tabularx}
+\caption{Validation across five countries and three exercise types.}
+\label{tab:validation}
+\end{table}
+
+\section{Availability}
+
+\subsection{Operating system}
+Pure Python; the test suite runs in continuous integration on Linux,
+macOS, and Windows.
+
+\subsection{Programming language}
+Python $\geq$ 3.11.
+
+\subsection{Additional system requirements}
+None; memory and disk requirements are trivial (national SUT and
+sector-accounts inputs are megabytes).
+
+\subsection{Dependencies}
+\texttt{openpyxl}. Optional: \texttt{certifi} (TLS trust store for API
+fetches on platforms without system certificates); \texttt{pytest} and
+\texttt{pytest-cov} (development).
+
+\subsection{Software location}
+\begin{description}
+  \item[Code repository:] GitHub,
+  \url{https://github.com/kodzovee9/tekmeris} (toolkit under
+  \texttt{toolkit/}); licence Apache-2.0; version 0.1.3, July 2026.
+  \item[Archive:] Zenodo, DOI
+  \href{https://doi.org/10.5281/zenodo.21425326}{10.5281/zenodo.21425326}
+  (version v0.1.3; concept DOI for all versions:
+  10.5281/zenodo.21419195); licence Apache-2.0.
+\end{description}
+
+\subsection{List of contributors}
+Kodzovi Abalo (design, development, validation).
+
+\subsection{Language}
+English.
+
+\section{Reuse potential}
+
+Three reuse paths correspond to the three recipes. Researchers can
+generate a validated, balanced macro SAM with one command and no manual
+data step for the countries the Eurostat datasets cover---the committed
+coverage table documents exactly which: for 2019, 11 of 37 candidates
+pass every core accounting check, a further 9 generate and balance with
+documented caveats, and every remaining case is classified and
+recorded. The same command run across countries gives
+comparably constructed matrices with per-country validation reports---including, where publication practice withholds cells, an
+explicit statement of what was suppressed. Analysts holding any
+distributed SAM can run the structural audit unmodified (two CSV
+sidecars---an account-classification table and published controls---
+enable the macro comparison), which makes routine due diligence on
+third-party SAMs practical for model users who did not build the matrix
+they depend on. And compilers working outside the harmonised
+universe can adapt the South African pipeline pattern documented in the
+recipes: registered sources, identity-checked ingestion, explicit
+concordances, formula tables, and logged balancing, reusing the library
+wholesale and replacing only country-specific configuration.
+
+Reusers should know the current limitations plainly. Version 0.1.3
+implements classical RAS only---not GRAS or cross-entropy---and standard
+RAS requires a non-negative seed (the pipeline's sign-normalisation rule
+handles the negative cells that arise in practice, and refuses
+silently mishandling others). The automatic Eurostat workflow produces a
+macro SAM, not a fully disaggregated multi-sector and household SAM.
+Adaptation outside the Eurostat universe requires country-specific
+source readers and mappings. Statistical confidentiality can prevent
+full cell-level reconstruction---the toolkit detects and quantifies
+suppression, but cannot undo it. And an accounting-consistent output is
+not necessarily an economically preferred allocation where multiple
+admissible mappings exist; the toolkit's contribution is to make the
+chosen mapping visible, not to certify it unique.
+
+Natural extensions, deliberately scoped out of version 0.1.3, include
+GRAS and cross-entropy balancing behind the same diagnostic interface
+\cite{robinson2001,temurshoev2013}, full multi-sector (rather than
+macro) generation from the 65-industry ESA core, and survey-driven
+household disaggregation following the companion paper's South African
+scripts. User support, bug reports, and feature requests are managed through
+the repository's GitHub Issues page; contributions are welcome, and the
+test suite and the identity-as-assertion discipline define the contract
+new code must meet.
+
+\section*{Data accessibility statement}
+The versioned software, redistributable sample inputs, validation
+reports, and generated outputs are archived with the software deposit
+identified above. Third-party inputs whose licences do not permit
+redistribution are not included; for each restricted input, the
+repository's \texttt{SOURCES.md} records the publisher, source
+location, access date, licence or access conditions, and SHA-256
+checksum required to verify a locally obtained copy.
+
+\section*{Generative AI use}
+Generative AI (Anthropic's Claude) was used for code generation,
+document parsing, and diagnostic assistance. All generated code,
+mappings, and outputs were reviewed by the author and accepted only
+after the deterministic accounting checks and tests described above
+were satisfied. The author assumes full responsibility for the
+software.
+
+\section*{Author roles}
+Kodzovi Abalo: conceptualisation, software design and development,
+validation, writing.
+
+\section*{Acknowledgements}
+The toolkit's validation relied on the openly distributed data of
+Statistics South Africa, the South African Reserve Bank, the Kenya
+National Bureau of Statistics, IFPRI, UNU-WIDER, and Eurostat; the
+unusually thorough documentation of the UNU-WIDER 2019 South African SAM
+\cite{vanseventer2023} is what made cell-level validation possible.
+
+\section*{Funding statement}
+No dedicated funding. The views expressed are the author's alone.
+
+\section*{Competing interests}
+The author declares no competing interests.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

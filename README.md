@@ -79,8 +79,10 @@ not be sold.
 ## Citing
 
 If you use the toolkit or the results, please cite the working paper
-(citation file: [`CITATION.cff`](CITATION.cff)); a software paper for
-`edikit` is in preparation.
+(citation file: [`CITATION.cff`](CITATION.cff)). A software metapaper
+for `edikit` is drafted at
+[`papers/S001-edikit-jors/`](papers/S001-edikit-jors/) (submission to
+the Journal of Open Research Software in preparation).
 
 ## License
 
