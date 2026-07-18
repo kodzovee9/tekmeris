@@ -14,7 +14,6 @@ claim; failures are documented, not hidden.
 
 import argparse
 import sys
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[2] / "src"))
@@ -100,7 +99,7 @@ def main() -> None:
              "requires-review", "partial", "unavailable", "fail"]
     n = {t: sum(1 for _, st, _ in rows if st == t) for t in tiers}
     with open(args.out, "w") as f:
-        f.write(f"# Country coverage, {args.year}\n\nGenerated {date.today()} "
+        f.write(f"# Country coverage, {args.year}\n\nGenerated "
                 f"by recipes/build/sweep.py over {len(rows)} candidate "
                 f"countries: {n['passes-core-checks']} pass every core check "
                 f"(zero identity findings, full commodity closure, no "
