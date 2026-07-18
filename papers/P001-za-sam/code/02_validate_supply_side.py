@@ -16,7 +16,6 @@ Run from this directory, after 01_extract_concordance.py:
 
 import csv
 import sys
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[3] / "toolkit" / "src"))
@@ -85,7 +84,7 @@ def main() -> None:
     worst = sorted(matched, key=lambda r: -abs(r[4]))[:10]
 
     with open(OUT / "supply_validation.md", "w") as f:
-        f.write(f"# Supply-side validation report\n\nGenerated {date.today()} "
+        f.write(f"# Supply-side validation report\n\nGenerated "
                 f"by code/02_validate_supply_side.py.\n\n")
         f.write("## Internal consistency of the official supply table (S-001)\n\n")
         f.write(f"- Products: {len(sut.products)}; industries: {len(sut.industries)}\n")

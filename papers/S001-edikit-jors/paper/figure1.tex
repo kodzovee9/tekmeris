@@ -1,0 +1,27 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usetikzlibrary{positioning,arrows.meta}
+\begin{document}
+\begin{tikzpicture}[
+  stage/.style={draw, rounded corners=2pt, align=center, font=\small,
+                minimum height=2.2em, inner sep=5pt, fill=gray!8},
+  note/.style={font=\scriptsize\itshape, text=gray!60!black, align=center},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[stage] (s1) {1.~Registered\\sources};
+\node[stage, right=0.55cm of s1] (s2) {2.~Verified\\ingestion};
+\node[stage, right=0.55cm of s2] (s3) {3.~Explicit\\classification};
+\node[stage, right=0.55cm of s3] (s4) {4.~Formula \&\\concordance layer};
+\node[stage, below=0.9cm of s4] (s5) {5.~Assembly};
+\node[stage, left=0.55cm of s5] (s6) {6.~Diagnostic\\reconciliation};
+\node[stage, left=0.55cm of s6] (s7) {7.~Logged\\balancing};
+\node[stage, left=0.55cm of s7] (s8) {8.~Reproducible\\artefacts};
+\draw[arr] (s1) -- (s2); \draw[arr] (s2) -- (s3);
+\draw[arr] (s3) -- (s4); \draw[arr] (s4) -- (s5);
+\draw[arr] (s5) -- (s6); \draw[arr] (s6) -- (s7); \draw[arr] (s7) -- (s8);
+\node[note, above=0.12cm of s1] {vintage, hash,\\licence};
+\node[note, above=0.12cm of s2] {identities as\\executable checks};
+\node[note, above=0.12cm of s3] {coverage\\assertions};
+\node[note, below=0.12cm of s6] {vs.\ identities and,\\if any, a benchmark};
+\node[note, below=0.12cm of s7] {every factor\\published};
+\node[note, below=0.12cm of s8] {matrix, reports,\\live workbook};
+\end{tikzpicture}
+\end{document}

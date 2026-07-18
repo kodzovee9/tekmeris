@@ -9,10 +9,15 @@ Run from this directory, after 06, 07, 08:  python 13_paper_tables.py
 """
 
 import csv
+import os
 import re
 import sys
 import zipfile
 from pathlib import Path
+
+# deterministic figure metadata: matplotlib honors SOURCE_DATE_EPOCH for
+# the PDF CreationDate, which must not vary run to run
+os.environ.setdefault("SOURCE_DATE_EPOCH", "0")
 
 import matplotlib
 matplotlib.use("Agg")

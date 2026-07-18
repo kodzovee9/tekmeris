@@ -23,7 +23,6 @@ Run from this directory, after 01 and 04:
 import csv
 import re
 import sys
-from datetime import date
 from pathlib import Path
 
 import xlrd
@@ -190,7 +189,7 @@ def main() -> None:
                         for k, v in r.items()})
 
     with open(OUT / "capital_split.md", "w") as f:
-        f.write(f"# Capital-stock disaggregation report\n\nGenerated {date.today()} "
+        f.write(f"# Capital-stock disaggregation report\n\nGenerated "
                 f"by code/07_split_capital.py.\n\n")
         f.write(f"- Table A4 parsed from the technical note: {len(a4)} SIC codes; "
                 f"AFS SIC blocks unmapped: {sorted(unmapped) if unmapped else 'none'}\n")

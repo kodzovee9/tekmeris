@@ -21,7 +21,6 @@ Run from this directory, after 01 and 02:
 
 import csv
 import sys
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[3] / "toolkit" / "src"))
@@ -103,7 +102,7 @@ def main() -> None:
     worst_va = sorted(comparison, key=lambda r: -abs(r["va_dev_pct"]))[:8]
 
     with open(OUT / "use_validation.md", "w") as f:
-        f.write(f"# Use-side validation report\n\nGenerated {date.today()} "
+        f.write(f"# Use-side validation report\n\nGenerated "
                 f"by code/03_validate_use_side.py.\n\n")
         f.write("## Internal consistency of the official use table (S-001)\n\n")
         f.write(f"- Products: {len(use.products)}; industries: {len(use.industries)}; "

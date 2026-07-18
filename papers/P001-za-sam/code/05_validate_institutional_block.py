@@ -21,7 +21,6 @@ Run from this directory, after 01 and 04:
 
 import csv
 import sys
-from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[3] / "toolkit" / "src"))
@@ -106,7 +105,7 @@ def main() -> None:
     # --- Report ---
     OUT.mkdir(exist_ok=True)
     with open(OUT / "institutional_validation.md", "w") as f:
-        f.write(f"# Institutional-block validation report\n\nGenerated {date.today()} "
+        f.write(f"# Institutional-block validation report\n\nGenerated "
                 f"by code/05_validate_institutional_block.py.\n\n")
         f.write("## Final demand: SUT categories vs SAM institutional spending\n\n")
         f.write("| Category | SUT (Rm) | SAM (Rm) | Gap (Rm) | Commodities exact |\n")
