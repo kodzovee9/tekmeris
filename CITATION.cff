@@ -6,11 +6,11 @@ authors:
   - family-names: Abalo
     given-names: Kodzovi
     orcid: "https://orcid.org/0000-0002-7567-2181"
-version: 0.1.4
+version: 0.1.5
 date-released: 2026-07-17
 license: Apache-2.0
 repository-code: "https://github.com/kodzovee9/tekmeris"
-doi: 10.5281/zenodo.21427760
+doi: 10.5281/zenodo.21428107
 preferred-citation:
   type: unpublished
   authors:
