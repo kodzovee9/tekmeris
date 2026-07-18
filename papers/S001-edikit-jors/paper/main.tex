@@ -36,8 +36,8 @@ enforced as executable checks at ingestion, classification is never
 inferred silently from labels or code conventions, every balancing
 adjustment is logged at
 the cell where it acts, and every run writes a validation report that
-constitutes the record. The toolkit was developed for, and validated across,
-five countries and three exercise types: a cell-level reconstruction
+constitutes the record. The toolkit was developed and validated across five
+countries and three exercise types: a cell-level reconstruction
 and audit of the
 published 2019 South African SAM (production and commodity structure
 reproduced exactly on all 61 activities), a structure-and-macro-controls
@@ -228,12 +228,13 @@ report reads, in excerpt:
 
 {\small
 \begin{verbatim}
-- Output and VA identities: 0 findings at EUR 1m tolerance
-- Commodity balance closure: 65/65 products within EUR 1m
-- GDP at basic prices (generated): EUR 724,960m
-| lab | -4,193 | -0.578% |    | row | -10,830 | -1.494% |
-- RAS [...] converged in 418 iterations; max residual EUR 0.009m
-- Adjustment factors: 70 cells in [0.9832, 1.0282]
+Output and VA identities: 0 findings at EUR 1m tolerance
+Commodity balance closure: 65/65 products within EUR 1m
+GDP at basic prices (generated): EUR 724,960m
+lab residual: -4,193 EUR m (-0.578% of GDP)
+row residual: -10,830 EUR m (-1.494% of GDP)
+RAS converged in 418 iterations; max residual EUR 0.009m
+Adjustment factors: 70 cells in [0.9832, 1.0282]
 \end{verbatim}}
 
 \subsection{Quality Control}
@@ -246,7 +247,7 @@ synthetic two-industry economy whose identities close exactly; line
 coverage is 91\,per\,cent overall (77--98\,per\,cent per implemented
 module; \texttt{pytest toolkit/tests -{}-cov=toolkit/src/edikit}), and
 a continuous-integration workflow runs the suite on Linux, macOS, and
-Windows across Pythons 3.11--3.13 on every push. Beyond the five
+Windows across Python versions 3.11--3.13 on every push. Beyond the five
 validation countries, a committed coverage sweep
 (\texttt{recipes/build/sweep.py}) runs the build pipeline across 37
 candidate countries for 2019 and classifies every outcome on the
@@ -283,7 +284,7 @@ South Africa & cell-level reconstruction, audited against the published
 UNU-WIDER benchmark & production and commodity structure exact on all 61
 activities and every final-demand category; 43 of 45 computable macro
 cells exact, the remaining two both reflecting a single documented
-R596m reconciling adjustment applied symmetrically; the benchmark's
+R596~million reconciling adjustment applied symmetrically; the benchmark's
 single unpublished input was priced separately \\
 Kenya & structural and macro-controls audit of the IFPRI Nexus SAM &
 structure verified; matrix balanced to its distribution's rounding
@@ -385,8 +386,8 @@ new code must meet.
 
 \section*{Data Accessibility Statement}
 The versioned software, redistributable sample inputs, validation
-reports, and generated outputs are archived with the software deposit
-identified above. Third-party inputs whose licences do not permit
+reports, and generated outputs are archived on Zenodo at
+doi:10.5281/zenodo.21425326. Third-party inputs whose licences do not permit
 redistribution are not included; for each restricted input, the
 repository's \texttt{SOURCES.md} records the publisher, source
 location, access date, licence or access conditions, and SHA-256
@@ -417,7 +418,8 @@ reflect the views of the World Bank, its Executive Directors, or the
 governments they represent.
 
 \section*{Funding Statement}
-No dedicated funding. The views expressed are the author's alone.
+No dedicated funding was received for the development of the software or
+the preparation of this manuscript.
 
 \section*{Competing Interests}
 The author declares no competing interests.
