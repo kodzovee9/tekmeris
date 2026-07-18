@@ -37,7 +37,7 @@ research papers built on it.
   validation reports, and the manuscript. Appendix E of the paper maps
   every claim to the script that produces it.
 
-## Reviewer pathway (five minutes, no network needed)
+## Reviewer pathway (five minutes; the generation itself runs offline)
 
 ```bash
 git clone https://github.com/kodzovee9/tekmeris && cd tekmeris
@@ -48,7 +48,8 @@ python 15_netherlands_generate.py
 ```
 
 The Dutch generation runs entirely from data committed in this
-repository (three registered Eurostat JSON responses). A successful run
+repository (three registered Eurostat JSON responses); only the initial
+`pip install` touches the network. A successful run
 prints:
 
 ```
