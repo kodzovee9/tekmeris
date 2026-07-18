@@ -28,10 +28,12 @@ all thin scripts over the same library (see `recipes/README.md`):
 - `recipes/audit/` — audit a published SAM: structure, then macro
   controls (`python audit_sam.py --sam matrix.csv ...`); Kenya is the
   committed worked example.
-- `recipes/build/` — generate a validated macro SAM for any
-  ESA-transmitting country in one command
-  (`python build_sam.py --country AT --year 2019`), with the adaptation
-  guide for countries outside the Eurostat universe.
+- `recipes/build/` — generate a validated macro SAM for covered ESA
+  country-years in one command
+  (`python build_sam.py --country AT --year 2019`; see
+  `recipes/build/COVERAGE.md` for which country-years the datasets
+  support), with the adaptation guide for countries outside the
+  Eurostat universe.
 
 ## Rules
 

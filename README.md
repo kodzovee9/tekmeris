@@ -12,8 +12,10 @@ research papers built on it.
 
 - **[`toolkit/`](toolkit/)** — `edikit`, a small Python library
   (Apache-2.0, Python ≥3.11, one dependency) in which accounting
-  identities are executable checks, classification is never by naming
-  convention, and every balancing adjustment is logged at the cell where
+  identities are executable checks, classification is never inferred
+  silently from labels or code conventions (explicit, reviewable prefix
+  rules are permitted and must be complete), and every balancing
+  adjustment is logged at the cell where
   it acts. Three documented entry points in
   [`toolkit/recipes/`](toolkit/recipes/):
 

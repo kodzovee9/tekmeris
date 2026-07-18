@@ -4,7 +4,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{booktabs}
 \usepackage[hidelinks]{hyperref}
-\usepackage[numbers]{natbib}
+\usepackage[round,numbers]{natbib}
+\renewcommand{\bibnumfmt}[1]{#1.}
 \usepackage{setspace}
 \usepackage{tabularx}
 \usepackage{tikz}
@@ -17,10 +18,9 @@
 
 \title{edikit: A Python Toolkit for Reproducible Construction and
 Auditing of National Social Accounting Matrices}
-\author{Kodzovi Abalo\thanks{World Bank; ORCID
-0000-0002-7567-2181. The views expressed here are those of the author
-and do not necessarily reflect the views of the World Bank, its
-Executive Directors, or the governments they represent.}}
+\author{Kodzovi Abalo\\
+\normalsize World Bank\\
+\normalsize ORCID 0000-0002-7567-2181}
 \date{}
 
 \begin{document}
@@ -100,7 +100,7 @@ at ingestion, explicit and complete account mappings, source-level
 provenance, and cell-specific diagnostics for every balancing
 adjustment into one testable source-to-artefact workflow.
 
-\subsection{Implementation and architecture}
+\subsection{Implementation and Architecture}
 
 Figure~\ref{fig:arch} shows the workflow the library implements; the
 same stages serve construction and audit, an audit adding a comparison
@@ -206,8 +206,8 @@ residual, and---when balancing is invoked---convergence, flipped cells,
 and the adjustment-factor range, with the factor of every individual
 cell in the balanced CSV; the reports, not the console, are the
 record. The
-recipes are thin by design: the same functionality is a five-line
-library call, e.g.
+recipes are thin by design: the same functionality is available through
+a short library workflow, for example:
 
 {\small
 \begin{verbatim}
@@ -236,7 +236,7 @@ report reads, in excerpt:
 - Adjustment factors: 70 cells in [0.9832, 1.0282]
 \end{verbatim}}
 
-\subsection{Quality control}
+\subsection{Quality Control}
 
 Three layers. First, a \texttt{pytest} suite (23 tests at the tagged
 release) in which the accounting identities are the test cases, covering
@@ -282,9 +282,9 @@ Country (2019) & Exercise & Outcome \\
 South Africa & cell-level reconstruction, audited against the published
 UNU-WIDER benchmark & production and commodity structure exact on all 61
 activities and every final-demand category; 43 of 45 computable macro
-cells exact, the remaining two differing by a documented R596m
-reconciling adjustment; the benchmark's single unpublished input
-separately priced \\
+cells exact, the remaining two both reflecting a single documented
+R596m reconciling adjustment applied symmetrically; the benchmark's
+single unpublished input was priced separately \\
 Kenya & structural and macro-controls audit of the IFPRI Nexus SAM &
 structure verified; matrix balanced to its distribution's rounding
 grain; production side within 1\% of published controls \\
@@ -338,7 +338,7 @@ Kodzovi Abalo (design, development, validation).
 \subsection{Language}
 English.
 
-\section{Reuse potential}
+\section{Reuse Potential}
 
 Three reuse paths correspond to the three recipes. Researchers can
 generate a validated, balanced macro SAM with one command and no manual
@@ -383,7 +383,7 @@ the repository's GitHub Issues page; contributions are welcome, and the
 test suite and the identity-as-assertion discipline define the contract
 new code must meet.
 
-\section*{Data accessibility statement}
+\section*{Data Accessibility Statement}
 The versioned software, redistributable sample inputs, validation
 reports, and generated outputs are archived with the software deposit
 identified above. Third-party inputs whose licences do not permit
@@ -392,7 +392,7 @@ repository's \texttt{SOURCES.md} records the publisher, source
 location, access date, licence or access conditions, and SHA-256
 checksum required to verify a locally obtained copy.
 
-\section*{Generative AI use}
+\section*{Generative AI Use}
 Generative AI (Anthropic's Claude) was used for code generation,
 document parsing, and diagnostic assistance. All generated code,
 mappings, and outputs were reviewed by the author and accepted only
@@ -400,7 +400,7 @@ after the deterministic accounting checks and tests described above
 were satisfied. The author assumes full responsibility for the
 software.
 
-\section*{Author roles}
+\section*{Author Roles}
 Kodzovi Abalo: conceptualisation, software design and development,
 validation, writing.
 
@@ -411,13 +411,18 @@ National Bureau of Statistics, IFPRI, UNU-WIDER, and Eurostat; the
 unusually thorough documentation of the UNU-WIDER 2019 South African SAM
 \cite{vanseventer2023} is what made cell-level validation possible.
 
-\section*{Funding statement}
+\section*{Disclaimer}
+The views expressed here are those of the author and do not necessarily
+reflect the views of the World Bank, its Executive Directors, or the
+governments they represent.
+
+\section*{Funding Statement}
 No dedicated funding. The views expressed are the author's alone.
 
-\section*{Competing interests}
+\section*{Competing Interests}
 The author declares no competing interests.
 
-\bibliographystyle{unsrtnat}
+\bibliographystyle{vancouver}
 \bibliography{references}
 
 \end{document}
