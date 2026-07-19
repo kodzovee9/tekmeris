@@ -226,6 +226,38 @@ def test_ras_rejects_bad_inputs():
         ras({("r", "c"): 1.0}, {"r": 1.0, "r2": 1.0}, {"c": 2.0})  # empty seed row
 
 
+def test_gras_reduces_to_ras_on_nonnegative_seed():
+    from edikit.model.balancing import gras, ras
+    seed = {("r1", "c1"): 1.0, ("r1", "c2"): 1.0, ("r2", "c1"): 1.0, ("r2", "c2"): 1.0}
+    rt, ct = {"r1": 6.0, "r2": 4.0}, {"c1": 7.0, "c2": 3.0}
+    a, b = ras(seed, rt, ct), gras(seed, rt, ct)
+    assert a.converged and b.converged
+    assert all(abs(a.matrix[k] - b.matrix[k]) < 1e-6 for k in a.matrix)
+
+
+def test_gras_handles_negative_seed_and_hits_margins():
+    from edikit.model.balancing import gras
+    # seed with a genuine negative entry (as a real SAM has: margins, cif/fob)
+    seed = {("r1", "c1"): 10.0, ("r1", "c2"): -2.0,
+            ("r2", "c1"): 3.0, ("r2", "c2"): 5.0}
+    rt, ct = {"r1": 12.0, "r2": 16.0}, {"c1": 20.0, "c2": 8.0}
+    g = gras(seed, rt, ct)
+    assert g.converged
+    rs, cs = {}, {}
+    for (r, c), v in g.matrix.items():
+        rs[r] = rs.get(r, 0.0) + v
+        cs[c] = cs.get(c, 0.0) + v
+    assert all(abs(rs[r] - rt[r]) < 1e-6 for r in rt)
+    assert all(abs(cs[c] - ct[c]) < 1e-6 for c in ct)
+    assert g.matrix[("r1", "c2")] < 0        # sign of the seed cell is preserved
+
+
+def test_gras_rejects_inconsistent_totals():
+    from edikit.model.balancing import gras
+    with pytest.raises(ValueError):
+        gras({("r", "c"): 1.0}, {"r": 2.0}, {"c": 1.0})
+
+
 def test_workbook_writer_live_formulas(tmp_path):
     from openpyxl import Workbook, load_workbook
     from edikit.report.workbook import add_matrix_sheet, add_readme_sheet, add_table_sheet
@@ -471,3 +503,332 @@ def test_audit_matrix_reader_kinds_and_controls(tmp_path):
     write_report(res, tmp_path / "a.md", title="T")
     text = (tmp_path / "a.md").read_text()
     assert "Control" in text and "50.0" in text
+
+
+def test_ansd_tre_reader_locates_blocks_and_checks_identities(tmp_path):
+    """Synthetic 2-product x 2-branch TRE in the ANSD layout: the reader must
+    locate the supply/use/VA blocks by label and the identities must close."""
+    import openpyxl
+    from edikit.data.ansd import read_tre, check_tre
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "2014"
+
+    def put(r, c, v):
+        ws.cell(row=r, column=c, value=v)
+
+    # branch descriptions (row 5) and branch codes (row 6, cols 12-13)
+    put(5, 12, "BRANCHE A"); put(5, 13, "BRANCHE B")
+    put(6, 12, "A00"); put(6, 13, "B00")
+    # --- supply block: product rows 7-8 ---
+    # cols: 3 purchaser, 11 basic, 12-13 make, 14 output, 15 cif, 16 imports
+    for r, code, desc, pur, basic, mkA, mkB, out, imp in [
+            (7, "A00", "Prod A", 110, 110, 100, 0, 100, 10),
+            (8, "B00", "Prod B", 220, 220, 0, 200, 200, 20)]:
+        put(r, 1, code); put(r, 2, desc); put(r, 3, pur); put(r, 11, basic)
+        put(r, 12, mkA); put(r, 13, mkB); put(r, 14, out); put(r, 15, 0); put(r, 16, imp)
+    # --- use block ---
+    put(10, 1, "Emploi des produits")
+    put(10, 16, "Exportations"); put(10, 17, "Consommation finale")
+    put(10, 18, "Menages Sous-total"); put(10, 19, "Autoconsommation")
+    put(10, 20, "Commercialisee"); put(10, 21, "Administrations")
+    put(10, 22, "ISBL"); put(10, 23, "Formation brute de capital fixe")
+    put(10, 24, "Variations des stocks"); put(10, 25, "objets de valeur")
+    for r, code, pur, ucA, ucB, hh in [
+            (12, "A00", 110, 30, 40, 40), (13, "B00", 220, 50, 60, 110)]:
+        put(r, 1, code); put(r, 3, pur); put(r, 12, ucA); put(r, 13, ucB); put(r, 18, hh)
+    # --- value-added block (cols 12-13 = branches) ---
+    for r, label, a, b in [
+            (15, "Valeur ajoutee brute /PIB", 20, 100),
+            (16, "Remuneration des salaries", 10, 40),
+            (17, "Salaires bruts", 10, 40),
+            (18, "Contributions sociales effectives", 0, 0),
+            (19, "Contributions sociales imputees", 0, 0),
+            (20, "Impots sur la production", 2, 10),
+            (21, "Subventions sur la production", 0, 0),
+            (22, "Excedent brut d'exploitation / revenu mixte", 8, 50)]:
+        put(r, 1, label); put(r, 12, a); put(r, 13, b)
+
+    p = tmp_path / "tre.xlsx"
+    wb.save(p)
+
+    tre = read_tre(str(p), 2014)
+    assert tre.products == ["A00", "B00"]
+    assert tre.branches == ["A00", "B00"]
+    assert tre.make[("A00", "A00")] == 100 and tre.make[("B00", "B00")] == 200
+    assert tre.use[("B00", "A00")] == 50
+    assert tre.value_added == {"A00": 20.0, "B00": 100.0}
+    assert tre.operating_surplus == {"A00": 8.0, "B00": 50.0}
+    assert tre.cons_households["B00"] == 110
+    assert tre.output_by_branch() == {"A00": 100.0, "B00": 200.0}
+    assert check_tre(tre) == []          # all four identities close
+
+    # break the VA decomposition and confirm the check catches it
+    tre.operating_surplus["A00"] = 999.0
+    findings = check_tre(tre)
+    assert any(f.check == "va-decomposition" and f.subject == "A00" for f in findings)
+
+
+def test_ansd_tcei_reader_tracks_account_and_direction(tmp_path):
+    """Synthetic institutional-sector sheet: the reader must key flows by
+    (sector, account, direction, code), keeping the same code distinct across
+    accounts and resources/emplois sides."""
+    import openpyxl
+    from edikit.data.ansd import read_tcei
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "0S1004"                       # households -> Men
+
+    def put(r, c, v):
+        ws.cell(row=r, column=c, value=v)
+
+    put(4, 2, "Code"); put(4, 3, "Operations"); put(4, 4, 2014); put(4, 5, 2015)
+    put(5, 3, "Compte d'affectation des revenus primaires")
+    put(6, 3, "Ressources")
+    put(7, 2, "D.1"); put(7, 3, "Remuneration"); put(7, 4, 100); put(7, 5, 110)
+    put(8, 2, "D.4"); put(8, 3, "Revenus de la propriete"); put(8, 4, 50); put(8, 5, 55)
+    put(9, 3, "Compte de distribution secondaire du revenu")
+    put(10, 3, "Emplois")
+    put(11, 2, "D.5"); put(11, 3, "Impots"); put(11, 4, 30); put(11, 5, 33)
+    p = tmp_path / "tcei.xlsx"
+    wb.save(p)
+
+    t = read_tcei(str(p), 2014)
+    assert t.get("Men", "primary", "resources", "D.1") == 100
+    assert t.get("Men", "primary", "resources", "D.4") == 50
+    assert t.get("Men", "secondary", "emplois", "D.5") == 30
+    # a code that is not present, or the wrong direction, returns the default
+    assert t.get("Men", "primary", "emplois", "D.1") == 0.0
+    # the other year column is read independently
+    assert read_tcei(str(p), 2015).get("Men", "primary", "resources", "D.1") == 110
+
+
+def test_ansd_tcei_reader_handles_npish_colb_headers_and_row_sheet(tmp_path):
+    """Two awkward sheet layouts: the NPISH sheet (0S1005) carries its account
+    headers in column B rather than column C, and the rest-of-the-world sheet
+    (0S2) uses the external-account block names. The reader must parse both."""
+    import openpyxl
+    from edikit.data.ansd import read_tcei
+    wb = openpyxl.Workbook()
+
+    # --- NPISH sheet: account header in column B ---
+    ws = wb.active
+    ws.title = "0S1005"
+
+    def put(ws, r, c, v):
+        ws.cell(row=r, column=c, value=v)
+
+    put(ws, 4, 2, "Code"); put(ws, 4, 3, "Operations"); put(ws, 4, 4, 2014)
+    put(ws, 5, 2, "Compte d'affectation des revenus primaires")   # header in col B
+    put(ws, 6, 3, "Ressources")
+    put(ws, 7, 2, "D.4"); put(ws, 7, 3, "Revenus de la propriete"); put(ws, 7, 4, 88)
+    put(ws, 8, 2, "Compte de capital")                            # header in col B
+    put(ws, 9, 3, "Ressources")
+    put(ws, 10, 2, "B.8"); put(ws, 10, 3, "Epargne brute"); put(ws, 10, 4, 45)
+
+    # --- rest-of-the-world sheet: external-account block names ---
+    ws2 = wb.create_sheet("0S2")
+    put(ws2, 4, 2, "Code"); put(ws2, 4, 3, "Operations"); put(ws2, 4, 4, 2014)
+    put(ws2, 5, 3, "Compte exterieur des revenus primaires et des transferts")
+    put(ws2, 6, 3, "Ressources")
+    put(ws2, 7, 2, "D.1"); put(ws2, 7, 3, "Remuneration"); put(ws2, 7, 4, 19)
+    put(ws2, 8, 3, "Emplois")
+    put(ws2, 9, 2, "D.1"); put(ws2, 9, 3, "Remuneration"); put(ws2, 9, 4, 64)
+    put(ws2, 10, 2, "B.12"); put(ws2, 10, 3, "Solde courant"); put(ws2, 10, 4, 670)
+
+    p = tmp_path / "tcei_edge.xlsx"
+    wb.save(p)
+    t = read_tcei(str(p), 2014)
+    # NPISH: header found in column B, capital-account saving read there
+    assert t.get("ISBL", "primary", "resources", "D.4") == 88
+    assert t.get("ISBL", "capital", "resources", "B.8") == 45
+    # RoW: the one external-current block keeps the two D.1 directions distinct
+    assert t.get("Rdm", "extcurrent", "resources", "D.1") == 19
+    assert t.get("Rdm", "extcurrent", "emplois", "D.1") == 64
+    assert t.get("Rdm", "extcurrent", "emplois", "B.12") == 670
+
+
+# ---------- cross-producer reconciliation ----------
+
+def test_nexus_classmap_maps_template_vocabulary():
+    from edikit.pipeline.reconcile import nexus_classmap
+    cases = {
+        "amaiz": "ACT", "acons": "ACT", "cmaiz": "COM", "ctob": "COM",
+        "flab-n": "LAB", "flab-s": "LAB", "fcap": "CAP", "flnd": "CAP",
+        "hhd-r1": "HH", "hhd-u5": "HH", "ent": "ENT", "gov": "GOV",
+        "row": "ROW", "s-i": "SAV", "dstk": "SAV",
+        "dtax": "GOV", "mtax": "GOV", "stax": "GOV", "trc": "COM",
+    }
+    for code, kind in cases.items():
+        assert nexus_classmap(code) == kind, code
+    assert nexus_classmap("wat") is None       # outside the template
+
+
+def test_macro_reduce_aggregates_and_flags_unclassified():
+    from edikit.pipeline.reconcile import macro_reduce, nexus_classmap
+    cells = {("amaiz", "cmaiz"): 10.0, ("arice", "cmaiz"): 5.0,  # both -> (ACT,COM)
+             ("cmaiz", "hhd-r1"): 7.0, ("cmaiz", "hhd-u2"): 3.0,  # both -> (COM,HH)
+             ("cmaiz", "zzz"): 99.0}                              # unknown col dropped
+    m, unclassified = macro_reduce(cells, nexus_classmap)
+    assert m[("ACT", "COM")] == 15.0
+    assert m[("COM", "HH")] == 10.0
+    assert unclassified == {"zzz"}
+    assert ("COM", None) not in m and 99.0 not in m.values()
+
+
+def test_national_accounts_counts_home_consumption_and_balances():
+    from edikit.pipeline.reconcile import national_accounts
+    # a balanced macro economy: activities make 100 of commodities; commodities
+    # sell 40 to activities (intermediates), 55 to households, 10 to capital,
+    # 15 as exports, minus 20 imports; households also buy 5 direct from
+    # activities (home consumption); factors 60 -> households; product tax 5.
+    m = {("ACT", "COM"): 100.0, ("COM", "ACT"): 40.0,
+         ("LAB", "ACT"): 35.0, ("CAP", "ACT"): 25.0, ("GOV", "COM"): 5.0,
+         ("COM", "HH"): 55.0, ("ACT", "HH"): 5.0, ("COM", "GOV"): 0.0,
+         ("COM", "SAV"): 10.0, ("COM", "ROW"): 15.0, ("ROW", "COM"): 20.0}
+    na = national_accounts(m)
+    assert na["Value added (factor cost)"] == 60.0
+    assert na["Net taxes on products"] == 5.0
+    assert na["Household consumption"] == 60.0        # 55 commodity + 5 home
+    assert na["GDP (income side)"] == 65.0
+    # 60 hh + 0 gov + 10 capital + 15 exports - 20 imports = 65
+    assert na["GDP (expenditure side)"] == 65.0
+
+
+def test_scale_to_billions_reads_units():
+    from edikit.pipeline.reconcile import scale_to_billions
+    assert scale_to_billions("CFA MLN") == (1e-3, "millions")
+    assert scale_to_billions("Billions of West African Cfa Franc")[0] == 1.0
+    assert scale_to_billions("millions of dollars")[0] == 1e-3
+    assert scale_to_billions("widgets") == (1.0, "widgets")   # unknown -> no rescale
+
+
+def test_jrc_classmap_maps_template_vocabulary():
+    from edikit.pipeline.reconcile import jrc_classmap
+    cases = {
+        "a_admn": "ACT", "ahf_DAK": "ACT",              # incl. household-farm activities
+        "c_arch": "COM", "chrice": "COM", "trcost": "COM",
+        "fl_SkillDAK": "LAB", "fl_UnSklZIG": "LAB", "flb_RWsk": "LAB",
+        "fcp_ag": "CAP", "fl_irr": "CAP", "flivst": "CAP",
+        "hh_RuralDAK": "HH", "hh_URDAKQ01": "HH",
+        "ent": "ENT", "govt": "GOV", "dirtax": "GOV", "imptax": "GOV",
+        "i_s": "SAV", "inv_road": "SAV", "row": "ROW", "hrow": "ROW",
+    }
+    for code, kind in cases.items():
+        assert jrc_classmap(code) == kind, code
+    assert jrc_classmap("zzz") is None
+
+
+def test_read_jrc_sam_long_form(tmp_path):
+    from edikit.pipeline.reconcile import read_jrc_sam
+    p = tmp_path / "jrc.csv"
+    # receiving = row (income), spending = col (expenditure); unit in header
+    p.write_text(
+        "Year,Spending Agent,Spending Agent (Code),Receiving Agent,"
+        "Receiving Agent (Code),Value (CFA MLN)\n"
+        "2014,Cereals comm,c_cer,Cereals act,a_cer,500\n"
+        "2014,Cereals act,a_cer,Labour,fl_SkillDAK,120\n"
+        "2014,Cereals act,a_cer,Cereals comm,c_cer,0\n")   # zero dropped
+    cells, unit = read_jrc_sam(str(p))
+    assert unit == "CFA MLN"
+    assert cells == {("a_cer", "c_cer"): 500.0, ("fl_SkillDAK", "a_cer"): 120.0}
+
+
+def test_reconcile_on_real_nexus_kenya_sam():
+    """End-to-end on a genuine IFPRI Nexus SAM committed in the repo: the
+    reduction must classify every account and the two GDP measures must agree
+    to the file's rounding grain (values are integer billions)."""
+    import pathlib
+    p = (pathlib.Path(__file__).parents[2] / "papers" / "P001-sut-to-sam" / "data"
+         / "raw" / "kenya" / "ifpri" / "002_IFPRI_SAM_KEN_2019_SAM.csv")
+    if not p.exists():
+        pytest.skip("Kenya Nexus SAM not present in this checkout")
+    from edikit.pipeline.audit import read_matrix_csv
+    from edikit.pipeline.reconcile import (macro_reduce, national_accounts,
+                                           nexus_classmap)
+    cells = read_matrix_csv(str(p), code_col=True)
+    m, unclassified = macro_reduce(cells, nexus_classmap)
+    assert not unclassified                       # whole template recognised
+    na = national_accounts(m)
+    gi, ge = na["GDP (income side)"], na["GDP (expenditure side)"]
+    assert gi > 9000 and abs(gi - ge) / gi < 2e-3  # agree within rounding
+    assert na["Imports"] > na["Exports"] > 0       # Kenya runs a trade deficit
+
+
+def test_reconcile_on_real_jrc_senegal_sam():
+    """End-to-end on the JRC (EC) 2014 Senegal SAM committed in the repo: the
+    218-account long-form matrix must classify with no leftover and balance
+    exactly (the file is not rounded, so income and expenditure GDP agree to
+    the franc)."""
+    import pathlib
+    p = (pathlib.Path(__file__).parents[2] / "papers" / "P002-senegal-sam"
+         / "data" / "raw" / "jrc"
+         / "Dataset_JRC_-_Social_accounting_matrix_-_Senegal_-_2014.csv")
+    if not p.exists():
+        pytest.skip("JRC Senegal SAM not present in this checkout")
+    from edikit.pipeline.reconcile import (jrc_classmap, macro_reduce,
+                                           national_accounts, read_jrc_sam)
+    cells, unit = read_jrc_sam(str(p))
+    assert unit == "CFA MLN"
+    m, unclassified = macro_reduce(cells, jrc_classmap)
+    assert not unclassified                       # all 218 accounts recognised
+    na = national_accounts(m)
+    gi, ge = na["GDP (income side)"], na["GDP (expenditure side)"]
+    assert abs(gi - ge) < 1.0                      # balanced to the franc
+    assert 7_000_000 < gi < 8_000_000             # ~7.6 trn CFA millions (old base)
+
+
+def test_ansd_mcs_reader_reads_square_matrix(tmp_path):
+    """Synthetic MCS: row codes in column B, the square matrix in the columns
+    that follow in the same account order, then a TOTAL row/column."""
+    import openpyxl
+    from edikit.data.ansd import read_mcs
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "2014"
+    accounts = ["J1", "I1", "Men", "TOTAL"]
+    # labels in column B (index 2 in openpyxl 1-based), matrix from column C
+    for i, a in enumerate(accounts):
+        ws.cell(row=8 + i, column=2, value=a)
+    # J1 <- I1 = 100 ; I1 <- J1 = 40 ; I1 <- Men = 60 ; Men <- (nothing)
+    ws.cell(row=8, column=4, value=100)      # J1 row, I1 col (col C+1)
+    ws.cell(row=9, column=3, value=40)       # I1 row, J1 col
+    ws.cell(row=9, column=5, value=60)       # I1 row, Men col
+    p = tmp_path / "mcs.xlsx"
+    wb.save(p)
+
+    m = read_mcs(str(p), 2014)
+    assert m.accounts == ["J1", "I1", "Men"]      # TOTAL excluded
+    assert m.cells[("J1", "I1")] == 100
+    assert m.cells[("I1", "J1")] == 40
+    assert m.cells[("I1", "Men")] == 60
+    assert ("Men", "J1") not in m.cells
+
+
+def test_write_reconciliation_emits_both_producers_and_divergence(tmp_path):
+    """The reconciliation report writer: two producers on the common grid
+    should yield a report naming both, carrying the national aggregates, and
+    surfacing unclassified accounts, mapping rules and notes.
+
+    NB: ``year`` is accepted but never written to the report -- callers put
+    the year in ``title``. Asserted absent here so the dead parameter is
+    recorded rather than silently tolerated."""
+    from edikit.pipeline.reconcile import Producer, write_reconciliation
+    m = {("ACT", "COM"): 100.0, ("COM", "ACT"): 40.0,
+         ("LAB", "ACT"): 35.0, ("CAP", "ACT"): 25.0,
+         ("COM", "HH"): 55.0, ("COM", "SAV"): 10.0,
+         ("COM", "ROW"): 15.0, ("ROW", "COM"): 20.0}
+    a = Producer(name="Office", macro_sam=m, unit="bn", scale=1.0)
+    b = Producer(name="Independent", macro_sam={k: v * 1.1 for k, v in m.items()},
+                 unit="bn", scale=1.0, unclassified={"zzz"})
+    out = tmp_path / "rec.md"
+    write_reconciliation(out, [a, b], title="Test reconciliation", year=2018,
+                         unit="bn", notes=["a disclosed note"],
+                         mapping_rules=["a mapping rule"])
+    text = out.read_text()
+    assert "# Test reconciliation" in text
+    assert "Office" in text and "Independent" in text
+    assert "a disclosed note" in text and "a mapping rule" in text
+    assert "GDP (income side)" in text
+    assert "2018" not in text          # see docstring: `year` is unused
+    assert "zzz" in text                      # unclassified accounts surfaced

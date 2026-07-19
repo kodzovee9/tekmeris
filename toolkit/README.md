@@ -9,7 +9,7 @@ exist only when a paper needed them — nothing is built speculatively.
 | Module | Role |
 | --- | --- |
 | `edikit.data` | source readers with accounting-identity checks on ingestion (SUT workbooks, SAM matrices, central-bank series, Eurostat JSON-stat, concordances) |
-| `edikit.model` | account taxonomy with coverage assertions; RAS balancing with per-cell factor diagnostics |
+| `edikit.model` | account taxonomy with coverage assertions; RAS and GRAS (negative-tolerant) balancing with per-cell factor diagnostics |
 | `edikit.report` | Excel workbooks whose totals and balance checks are live formulas |
 | `edikit.pipeline` | end-to-end generation (`eurostat_sam`, for covered ESA country-years — see [recipes/build/COVERAGE.md](recipes/build/COVERAGE.md)) and auditing (`audit`) |
 

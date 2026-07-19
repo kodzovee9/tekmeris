@@ -239,12 +239,13 @@ Adjustment factors: 70 cells in [0.9832, 1.0282]
 
 \subsection{Quality Control}
 
-Three layers. First, a \texttt{pytest} suite (23 tests at the tagged
+Three layers. First, a \texttt{pytest} suite (39 tests at the tagged
 release) in which the accounting identities are the test cases, covering
-the readers, the classification and tiling machinery, RAS diagnostics,
-the audit pipeline, and end-to-end generation and balancing on a
+the readers, the classification and tiling machinery, RAS and GRAS
+diagnostics, the audit pipeline, the cross-producer reconciliation
+reporter, and end-to-end generation and balancing on a
 synthetic two-industry economy whose identities close exactly; line
-coverage is 91\,per\,cent overall (84--98\,per\,cent per implemented
+coverage is 93\,per\,cent overall (84--99\,per\,cent per implemented
 module; \texttt{pytest toolkit/tests -{}-cov=toolkit/src/edikit}), and
 a continuous-integration workflow runs the suite on Linux, macOS, and
 Windows across Python versions 3.11--3.13 on every push. Beyond the five
@@ -326,7 +327,12 @@ fetches on platforms without system certificates); \texttt{pytest} and
 \begin{description}
   \item[Code repository:] GitHub,
   \url{https://github.com/kodzovee9/tekmeris} (toolkit under
-  \texttt{toolkit/}); licence Apache-2.0; version 0.1.5, July 2026.
+  \texttt{toolkit/}); licence Apache-2.0; version 0.2.0, July 2026.
+  % !! STALE: this is the v0.1.5 VERSION DOI. The manuscript now describes
+  % !! v0.2.0. Cut a v0.2.0 release on the public repo so Zenodo mints a new
+  % !! version DOI, then replace the two occurrences here and in the Data
+  % !! Accessibility Statement. The concept DOI below is version-independent
+  % !! and stays as is. DO NOT SUBMIT until this is resolved.
   \item[Archive:] Zenodo, DOI
   \href{https://doi.org/10.5281/zenodo.21428107}{10.5281/zenodo.21428107}
   (version v0.1.5; concept DOI for all versions:
@@ -360,11 +366,16 @@ recipes: registered sources, identity-checked ingestion, explicit
 concordances, formula tables, and logged balancing, reusing the library
 wholesale and replacing only country-specific configuration.
 
-Reusers should know the current limitations plainly. Version 0.1.5
-implements classical RAS only---not GRAS or cross-entropy---and standard
-RAS requires a non-negative seed (the pipeline's sign-normalisation rule
-handles the negative cells that arise in practice, and refuses
-silently mishandling others). The automatic Eurostat workflow produces a
+Reusers should know the current limitations plainly. Version 0.2.0
+implements classical RAS and GRAS \cite{temurshoev2013}---the latter
+negative-tolerant, so matrices carrying negative cells can be balanced
+directly, while standard RAS requires a non-negative seed (the
+pipeline's sign-normalisation rule handles the negative cells that arise
+in practice under RAS, and refuses silently mishandling others). It does
+not implement cross-entropy balancing against an arbitrary prior; note
+that where both row and column margins are fixed, cross-entropy to a
+prior coincides with RAS or GRAS seeded with that prior, so the gap bears
+only on partial-margin problems. The automatic Eurostat workflow produces a
 macro SAM, not a fully disaggregated multi-sector and household SAM.
 Adaptation outside the Eurostat universe requires country-specific
 source readers and mappings. Statistical confidentiality can prevent
@@ -374,9 +385,9 @@ not necessarily an economically preferred allocation where multiple
 admissible mappings exist; the toolkit's contribution is to make the
 chosen mapping visible, not to certify it unique.
 
-Natural extensions, deliberately scoped out of version 0.1.5, include
-GRAS and cross-entropy balancing behind the same diagnostic interface
-\cite{robinson2001,temurshoev2013}, full multi-sector (rather than
+Natural extensions, deliberately scoped out of version 0.2.0, include
+cross-entropy balancing against a prior under partial margin information
+\cite{robinson2001}, full multi-sector (rather than
 macro) generation from the 65-industry ESA core, and survey-driven
 household disaggregation following the companion paper's South African
 scripts. User support, bug reports, and feature requests are managed through

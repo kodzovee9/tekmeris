@@ -175,9 +175,14 @@ def main() -> None:
         f.write("\\begin{tabular}{lrrr}\n\\toprule\n")
         f.write("Aggregate & SAM & KNBS & Dev.\\ \\% \\\\\n\\midrule\n")
         for r in ken:
-            dev = f"{float(r['dev_pct']):+.1f}" if r["dev_pct"] else "---"
-            f.write(f"{r['aggregate']} & {float(r['sam_bn']):,.0f} & "
-                    f"{float(r['knbs_bn']):,.0f} & {dev} \\\\\n")
+            # recompute the deviation from sam/knbs rather than re-rounding the
+            # CSV's 2-dp dev_pct (which double-rounds boundary values, e.g.
+            # taxes -0.95 -> -0.9 instead of -1.0)
+            sam_v, knbs_v = float(r["sam_bn"]), float(r["knbs_bn"])
+            dev = (f"{(sam_v - knbs_v) / abs(knbs_v) * 100:+.1f}"
+                   if r["dev_pct"] else "---")
+            f.write(f"{r['aggregate']} & {sam_v:,.0f} & "
+                    f"{knbs_v:,.0f} & {dev} \\\\\n")
         f.write("\\bottomrule\n\\end{tabular}\n")
 
     # ---- Table: Netherlands generated macro SAM residuals ----
