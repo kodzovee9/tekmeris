@@ -1,7 +1,7 @@
 # Replicate recipe
 
 Regenerate every number in the P001 working paper from the registered
-sources. The replication package is `papers/P001-za-sam/`:
+sources. The replication package is `papers/P001-sut-to-sam/`:
 
 - `data/SOURCES.md` — the source registry (publisher, vintage, URL,
   SHA-256 for every input). Public raw files are committed under

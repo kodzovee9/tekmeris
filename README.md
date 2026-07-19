@@ -29,7 +29,7 @@ research papers built on it.
   cd toolkit/recipes/build && python build_sam.py --country AT --year 2019
   ```
 
-- **[`papers/P001-za-sam/`](papers/P001-za-sam/)** — the working paper
+- **[`papers/P001-sut-to-sam/`](papers/P001-sut-to-sam/)** — the working paper
   *"From Supply and Use Tables to Reproducible Social Accounting
   Matrices: A Transparent Construction and Audit Framework"* (South
   Africa · Kenya · Netherlands) with its complete replication package:
@@ -43,7 +43,7 @@ research papers built on it.
 git clone https://github.com/kodzovee9/tekmeris && cd tekmeris
 pip install -e "./toolkit[dev]"
 pytest toolkit/tests -q          # expected: 23 passed
-cd papers/P001-za-sam/code
+cd papers/P001-sut-to-sam/code
 python 15_netherlands_generate.py
 ```
 
@@ -67,12 +67,12 @@ choice: `cd toolkit/recipes/build && python build_sam.py --country AT
 ## Data availability
 
 Raw inputs whose licences permit redistribution are committed under
-`papers/P001-za-sam/data/raw/` (Statistics South Africa, with
+`papers/P001-sut-to-sam/data/raw/` (Statistics South Africa, with
 attribution; IFPRI, CC-BY-4.0; Eurostat, free reuse with attribution).
 Inputs that cannot be redistributed — SARB Quarterly Bulletin bulk
 files, KNBS Economic Surveys, the UNU-WIDER benchmark SAM, and
 DataFirst survey microdata — are registered in
-[`SOURCES.md`](papers/P001-za-sam/data/SOURCES.md) with source URL,
+[`SOURCES.md`](papers/P001-sut-to-sam/data/SOURCES.md) with source URL,
 access date, and SHA-256 hash: fetch them from the publisher and verify
 the hash before running the scripts that need them (each script's
 docstring states its inputs). Statistics South Africa data are used and

@@ -46,7 +46,7 @@ How to read the deviations:
 Cell-level auditing means rebuilding the matrix from the same sources
 and comparing cell by cell; that is a construction exercise — see the
 [build recipe](../build/) and the P001 South Africa pipeline
-(`papers/P001-za-sam/code/`, scripts 01–12), which is the complete
+(`papers/P001-sut-to-sam/code/`, scripts 01–12), which is the complete
 worked example including recovery of undocumented choices (grid searches
 over source editions and formula signs) and pricing of non-public inputs.
 
@@ -58,12 +58,12 @@ documenting the reconciliation's inputs.
 ## Worked example: Kenya
 
 `examples/kenya/` audits the IFPRI 2019 Nexus SAM (CC-BY-4.0, committed
-under `papers/P001-za-sam/data/raw/kenya/`) against KNBS Economic Survey
+under `papers/P001-sut-to-sam/data/raw/kenya/`) against KNBS Economic Survey
 2020 controls:
 
 ```bash
 python audit_sam.py \
-    --sam ../../../papers/P001-za-sam/data/raw/kenya/ifpri/002_IFPRI_SAM_KEN_2019_SAM.csv \
+    --sam ../../../papers/P001-sut-to-sam/data/raw/kenya/ifpri/002_IFPRI_SAM_KEN_2019_SAM.csv \
     --format matrix --code-col \
     --kinds examples/kenya/kinds.csv --controls examples/kenya/controls.csv \
     --out examples/kenya/kenya_audit.md

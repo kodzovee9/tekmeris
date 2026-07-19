@@ -68,11 +68,11 @@ in the accompanying working paper.
 For a country outside the ESA transmission programme, the API stage is
 replaced by your country's published files; everything downstream reuses
 the same toolkit machinery. The working paper's South Africa pipeline
-(`papers/P001-za-sam/code/`, scripts 01–12) is the worked example of the
+(`papers/P001-sut-to-sam/code/`, scripts 01–12) is the worked example of the
 full pattern:
 
 1. **Register your sources** — every raw file with vintage, URL, and
-   SHA-256 hash (see `papers/P001-za-sam/data/SOURCES.md` for the format).
+   SHA-256 hash (see `papers/P001-sut-to-sam/data/SOURCES.md` for the format).
 2. **Read and verify the SUT** — `edikit.data.sut` shows the pattern for
    an Excel-published supply-use table: recompute embedded totals, enforce
    the output/VA/supply identities before using a single number.
