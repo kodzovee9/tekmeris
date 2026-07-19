@@ -46,7 +46,7 @@ class Concordance:
         return out
 
     def to_csv(self, path: str) -> None:
-        with open(path, "w", newline="") as f:
+        with open(path, "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
             w.writerow(["source", "target", "target_label"])
             for src, tgt in self.mapping.items():
