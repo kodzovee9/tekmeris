@@ -218,3 +218,67 @@ R7~million---under 0.0002\,per\,cent of GDP, and the sense in which
 \emph{toward} the benchmark's item-based values. The result, SAM v0.2, ships as a workbook whose totals and balance
 checks are live formulas and whose 266 balancing factors are printed on
 their own sheet.
+
+\subsection{External corroboration: an independently constructed SAM}
+\label{sec:results:jrc}
+
+Every comparison so far is against the benchmark this paper set out to
+audit, which leaves one question open: whether the reconstruction is
+right, or merely faithful to the artefact it was built to reproduce.
+A second, independently constructed SAM for the same country-year
+provides the first check that is not of our own making. The Joint
+Research Centre published one in November 2025 \citep{elmeligi2025}: 449
+accounts against our 209, disaggregated by province, gender, and
+formal--informal status, estimated by entropy methods rather than
+assembled deterministically, and distributed openly under the
+Commission's reuse licence. It was not consulted during construction;
+the comparison below was made after this paper's SAM was final.
+
+Table~\ref{tab:jrc} sets the two side by side on the macro aggregates
+both report. They agree to within 0.8~per~cent on every one, and to
+within 0.1~per~cent on four of the eight, including both trade
+aggregates and total intermediate demand.
+
+\begin{table}[t]
+\centering\small
+\caption{The 2019 South African SAM of this paper against the
+independently constructed SAM of \citet{elmeligi2025}, on the macro
+aggregates both report.}
+\label{tab:jrc}
+\input{tables/tab_jrc}
+\end{table}
+
+Two qualifications keep this in proportion. The agreement is between two
+\emph{constructions}, not two measurements: both ultimately rest on
+Statistics South Africa's national accounts, so common inputs explain
+part of it, and the exercise cannot detect an error the source itself
+contains. And it is an agreement of aggregates: the two matrices classify
+at different resolutions, so a cell-level comparison would require a
+concordance neither publishes. What the table does establish is that two
+teams, working from the same official record with different methods and
+different disaggregation, arrive at the same macro picture---and that our
+reconstruction's departures from the benchmark, catalogued above, are
+not artefacts of our own pipeline.
+
+The JRC's file also earns a point the audit method is well placed to
+make. It balances \emph{exactly}: all 449 accounts close to within
+$10^{-9}$ at the precision distributed, which is better than the Kenyan
+file of Section~\ref{sec:applications:kenya}, where rounding unbalances
+the published matrix, and better than the Dutch matrix this paper
+distributes. Distributing at full precision is a small discipline with a
+large effect on what a later auditor can do, and it is worth recording
+when a producer gets it right.
+
+The same distribution also carries two divergences between record and
+artefact of the kind catalogued in Section~\ref{sec:discussion}, both
+apparent from reading its accompanying files against its contents. Its
+value column is headed \emph{Million ZAR} while the values are expressed
+in billions, as a comparison with published national accounts indicates
+(value added of 4{,}955 against a 2019 GDP of approximately
+5{,}078~billion rand). The readme distributed inside the archive
+describes the dataset as the ``social accounting matrix for Nigeria
+2019'', the title of the same programme's Nigerian SAM. Neither affects a
+number in the matrix, and neither is likely to mislead a careful user.
+Both are of the type that an ingestion-time check on a machine-readable
+record identifies before release, which is the case this paper makes for
+such checks generally.

@@ -142,29 +142,35 @@ no grid candidate fits exactly---as in the capital split---the true basis
 may lie outside the set we enumerated.
 
 Two limits are structural rather than circumstantial, and neither is
-removed by better data. The first is what the method can see. Every
-finding reported here was detected because it left an arithmetic
-fingerprint: an identity refusing to close, a grid returning one survivor,
-a pair of gaps too symmetric to be coincidence. Divergences that leave no
-such trace---compensating errors, an adjustment that lands on a plausible
-value, an error shared between the artefact and the sources it is checked
-against---pass every test in this framework silently. The audit therefore
-establishes reproducibility of a matrix from its stated record, which is
-not the same as its correctness; no number in this paper is validated
-against an independent measurement of the same quantity, and none of our
-three cases could have been.
+removed by better data. The first concerns what the method is able to
+detect. Every finding reported here was identified because it left an
+arithmetic trace: an identity that did not close, a grid search returning
+a single survivor, or a pair of gaps whose symmetry was unlikely to be
+coincidental. Divergences that leave no such trace pass through this
+framework without being detected. These include compensating errors,
+adjustments that happen to land on a plausible value, and errors shared
+between the artefact and the sources against which it is checked. The
+audit therefore establishes that a matrix is reproducible from its stated
+record, which is a narrower property than correctness. The comparison in
+Section~\ref{sec:results:jrc} narrows this gap without closing it: an
+independently constructed SAM for the same country-year agrees with ours
+on every macro aggregate to within 0.8~per~cent, which is meaningful
+corroboration, but it remains agreement between two constructions resting
+on a shared official source rather than a second measurement of the same
+economy. An error contained in the source record itself would not be
+detected by any check reported here.
 
-The second is that the framework logs without judging. It reports every
-adjustment factor, coverage share, and residual, but it does not encode a
-threshold above which a matrix should be rejected, and we do not propose
-one here: the tolerable magnitude of a balancing adjustment depends on the
-account, the country, and the use to which the SAM will be put, and a
-number chosen to fit three cases would be arbitrary precision dressed as a
-standard. What the framework changes is that the question becomes
-answerable by a reader---the factors and residuals are published, so a
-user can apply their own threshold---rather than invisible. A discipline
-that wants rejection rules will need them agreed by producers, not
-asserted by one toolkit.
+The second limit is that the framework records without evaluating. It
+reports every adjustment factor, coverage share, and residual, but it
+does not encode a threshold above which a matrix should be rejected, and
+we do not propose one. The tolerable magnitude of a balancing adjustment
+depends on the account, the country, and the intended use of the SAM, so
+a threshold calibrated to three cases would carry more apparent authority
+than the evidence supports. What the framework changes is the
+availability of the question rather than its answer: because the factors
+and residuals are published, a reader can apply whichever threshold their
+application requires. Rejection criteria for the field would need to be
+agreed among producers rather than set by a single implementation.
 
 Finally, our own pipeline's mistakes---one of which we document---were
 caught by the same assertions we advocate; we take that as the strongest
