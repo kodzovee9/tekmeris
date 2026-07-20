@@ -117,10 +117,19 @@ def main() -> None:
 
     out = OUT / "P001_SA_SAM_2019_v02.xlsx"
     # deterministic artifact: fixed document properties and zip-entry
-    # timestamps, so regeneration is byte-for-byte
+    # timestamps, so regeneration is byte-for-byte.
+    #
+    # Pinning wb.properties is necessary but not sufficient: openpyxl
+    # rewrites dcterms:modified with the wall clock as it saves, so the
+    # pinned value survives for `created` and not for `modified`. Two
+    # consecutive runs then differ in that one field, which is enough to
+    # break a hash comparison. The rewrite below therefore substitutes the
+    # timestamp in docProps/core.xml as the entries are repacked.
     from datetime import datetime as _dt
     import io as _io
+    import re as _re
     import zipfile as _zf
+    _EPOCH = "2000-01-01T00:00:00Z"
     wb.properties.created = _dt(2000, 1, 1)
     wb.properties.modified = _dt(2000, 1, 1)
     _buf = _io.BytesIO()
@@ -128,9 +137,14 @@ def main() -> None:
     with _zf.ZipFile(_buf) as _zin, \
             _zf.ZipFile(out, "w", _zf.ZIP_DEFLATED) as _zout:
         for _name in sorted(_zin.namelist()):
+            _payload = _zin.read(_name)
+            if _name == "docProps/core.xml":
+                _payload = _re.sub(
+                    rb'(<dcterms:(?:created|modified)[^>]*>)[^<]*',
+                    lambda m: m.group(1) + _EPOCH.encode(), _payload)
             _info = _zf.ZipInfo(_name, date_time=(1980, 1, 1, 0, 0, 0))
             _info.compress_type = _zf.ZIP_DEFLATED
-            _zout.writestr(_info, _zin.read(_name))
+            _zout.writestr(_info, _payload)
     print(f"written {out.name}: {len(wb.sheetnames)} sheets, "
           f"{len(v02):,} SAM cells, {len(adj_rows)} logged adjustments")
 

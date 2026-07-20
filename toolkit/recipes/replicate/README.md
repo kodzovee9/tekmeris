@@ -17,7 +17,28 @@ sources. The replication package is `papers/P001-sut-to-sam/`:
 - `code/15` — Netherlands: benchmark-free macro-SAM generation.
 - `paper/` — the LaTeX manuscript; exhibits regenerate from `code/13`.
 
+## Install
+
+```bash
+pip install -e "./toolkit[dev,replicate]"
+```
+
+`edikit` itself needs only `openpyxl`. The `replicate` extra adds two
+packages that the P001 scripts use but the library does not: `xlrd`
+(script 07 reads the Stats SA Annual Financial Statistics, which are
+legacy `.xls`) and `matplotlib` (script 13 draws the paper's figure).
+Without it those two scripts stop with `ModuleNotFoundError`; the other
+thirteen are unaffected.
+
 Run scripts in numeric order from `code/` (each states its inputs in its
-docstring; 01–06 and 10–15 need only committed data). Every script
-writes a validation report to `outputs/` — the reports, not the console,
-are the record.
+docstring). Every script writes a validation report to `outputs/` — the
+reports, not the console, are the record.
+
+Most scripts need inputs that cannot be redistributed here. From a clean
+clone, with no fetched data, three run to completion (12, 14, 15) and the
+rest stop on a registered source: nine on the UNU-WIDER benchmark and one
+(script 10) on the SARB series values, whose codes are listed in
+`data/derived/sarb_kbp_series.csv` but whose observations come from the
+Quarterly Bulletin files registered as S-004. That is expected behaviour,
+not breakage; `data/raw/NOT-REDISTRIBUTED.md` states where each fetched
+file belongs.
