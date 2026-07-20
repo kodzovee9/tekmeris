@@ -30,7 +30,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | SHA-256 | `4163785fa0ff1c27d82562b7d100a89804513fc3fb4dc4b6987e6fa59208791c` |
 | Use in P001 | Methodological documentation: valuation bases, margins, classifications |
 
-## S-003 — UNU-WIDER 2019 South Africa SAM (benchmark) — PENDING
+## S-003 — UNU-WIDER 2019 South Africa SAM (benchmark) — OBTAINED
 
 | Field | Value |
 | --- | --- |
@@ -41,8 +41,11 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Data URL | https://www.wider.unu.edu/sites/default/files/Publications/Technical-note/tn2023-1-2019-SASAM-for-distribution.zip |
 | Documentation | https://www.wider.unu.edu/sites/default/files/Publications/Technical-note/PDF/tn2023-1-2019-SAM-South-Africa-occupational-capital-stock-detail.pdf |
 | License | © UNU-WIDER 2023; explicit redistribution terms not stated on the page — **treat as non-redistributable until confirmed**. File will be stored under `external/` (git-ignored); the replication package ships fetch instructions + hash, not the file. |
+| Files | `external/tn2023-1-2019-SASAM-for-distribution.zip` (520 KB) and the workbook extracted from it, `external/tn2023-1-2019-SASAM-for-distribution.xlsx` (616 KB). Not redistributed; fetch from the Data URL above and verify against the hashes below. |
+| SHA-256 (zip) | `515f98108a8951d02f9808903e319e7fee5e44f67b9b71839392e9c7966b2d99` |
+| SHA-256 (xlsx) | `8a79715cc9d39194fc55afa8e7968f1f36d071a88bc4a067e033d5f7e17cc144` |
 | Use in P001 | Validation benchmark: the published SAM built from the same official 2019 sources |
-| Status | Awaiting download |
+| Status | Obtained 2026-07-16; hashes recorded 2026-07-19 |
 
 ## S-004 — SARB Quarterly Bulletin national accounts (KBP series) — OBTAINED
 
@@ -57,7 +60,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Coverage check | All 69 required codes present in the annual (J1) sheets with 2019 values. Vintage verified: KBP6007J (household consumption) = R3,588,896m and KBP6014J (imports) = R1,502,065m equal the benchmark SAM's corresponding cells exactly — this is the "SARB 2022" vintage the technical note cites. |
 | Status | Obtained |
 
-## S-005 — Stats SA Labour Market Dynamics 2018 & 2019 — PENDING
+## S-005 — Stats SA Labour Market Dynamics 2018 & 2019 — OBTAINED
 
 | Field | Value |
 | --- | --- |
@@ -67,7 +70,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Files | `external/lmdsa-2018-v1.0-csv.zip` (LMD 2018 v1.0 CSV, SHA-256 `c18e20d1…c664ee2`) and `external/lmdsa-2019-v1.1.zip` (LMD 2019 v1.1, SHA-256 `2df63362…5af342e0`, 168 MB CSV inside) — both git-ignored: DataFirst terms prohibit redistribution; replication package ships scripts + aggregated shares only |
 | Status | Both years obtained — **S-005 complete. Data audit closed: every source family used by the benchmark is in hand.** |
 
-## S-006 — Stats SA Living Conditions Survey 2014/15 (P0310) — PENDING
+## S-006 — Stats SA Living Conditions Survey 2014/15 (P0310) — OBTAINED
 
 | Field | Value |
 | --- | --- |
@@ -77,7 +80,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Files | `external/lcs-2014-2015-v1-csv.zip` (LCS 2014/15 v1 CSV, SHA-256 `9de5ade4208cd36103edbbf36bc649dcff4b3a1b92095ff980527116ac500cf9`, git-ignored: DataFirst terms prohibit redistribution — replication package ships scripts + aggregated decile shares only) |
 | Status | Obtained |
 
-## S-007 — Stats SA Annual Financial Statistics 2019 (P0021) — PENDING
+## S-007 — Stats SA Annual Financial Statistics 2019 (P0021) — OBTAINED
 
 | Field | Value |
 | --- | --- |
@@ -130,6 +133,7 @@ Replicability finding, refined: Kenya's SUT is public only at condensed level; t
 | Publisher | Eurostat (ESA 2010 transmission programme); free reuse with attribution |
 | Acquisition | **100% programmatic** via the Eurostat dissemination API (statistics/1.0), 2026-07-17 — no browser, no manual step; fetch commands recorded in the audit script |
 | Files | `raw/netherlands/naio_10_cp15_NL_2019.json` (supply table at basic prices incl. transformation, 114 industries x 111 products, 5,237 values); `naio_10_cp16_NL_2019.json` (use table at purchasers' prices, 121 use columns incl. P3_S13/S14/S15, P51G, P52, P53, P6, x 120 rows incl. the full VA block B1G/D1/D29X39/B2A3G, 6,106 values); `nasa_10_nf_tr_NL_2019.json` (non-financial transactions, 132 ESA items x 14 institutional sectors x paid/received, 1,290 values) |
+| SHA-256 | `raw/netherlands/naio_10_cp15_NL_2019.json` `cefd02794843d898f85b2e87c492d7798f62b7fea91a9f84f9ffbb2c7340ba1f`; `naio_10_cp16_NL_2019.json` `f0bdbb317792fd7da61a6141bc523e52287063acd4a061ed6a3b1c429b58810a`; `nasa_10_nf_tr_NL_2019.json` `aaa52b563491bb3606e58a9a6b8de36b8589499010218d5d013482c537dbbafc` (recorded 2026-07-19; these files are committed, so the hashes are verifiable directly from the package) |
 | Purpose | Third application: benchmark-free SAM generation — tests the toolkit as a generator (no benchmark to crib concordances or formulas from), with acquisition cost effectively zero |
 | Notes | Imports per product derivable from TS_BP minus domestic output (DOM/IMP stk_flow splits not populated for NL); margins column OTTM; adjustment rows (OP_RES, ADJ_P6/P7) present and to be handled explicitly |
 
