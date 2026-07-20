@@ -755,29 +755,6 @@ def test_reconcile_on_real_nexus_kenya_sam():
     assert na["Imports"] > na["Exports"] > 0       # Kenya runs a trade deficit
 
 
-def test_reconcile_on_real_jrc_senegal_sam():
-    """End-to-end on the JRC (EC) 2014 Senegal SAM committed in the repo: the
-    218-account long-form matrix must classify with no leftover and balance
-    exactly (the file is not rounded, so income and expenditure GDP agree to
-    the franc)."""
-    import pathlib
-    p = (pathlib.Path(__file__).parents[2] / "papers" / "P002-senegal-sam"
-         / "data" / "raw" / "jrc"
-         / "Dataset_JRC_-_Social_accounting_matrix_-_Senegal_-_2014.csv")
-    if not p.exists():
-        pytest.skip("JRC Senegal SAM not present in this checkout")
-    from edikit.pipeline.reconcile import (jrc_classmap, macro_reduce,
-                                           national_accounts, read_jrc_sam)
-    cells, unit = read_jrc_sam(str(p))
-    assert unit == "CFA MLN"
-    m, unclassified = macro_reduce(cells, jrc_classmap)
-    assert not unclassified                       # all 218 accounts recognised
-    na = national_accounts(m)
-    gi, ge = na["GDP (income side)"], na["GDP (expenditure side)"]
-    assert abs(gi - ge) < 1.0                      # balanced to the franc
-    assert 7_000_000 < gi < 8_000_000             # ~7.6 trn CFA millions (old base)
-
-
 def test_ansd_mcs_reader_reads_square_matrix(tmp_path):
     """Synthetic MCS: row codes in column B, the square matrix in the columns
     that follow in the same account order, then a TOTAL row/column."""

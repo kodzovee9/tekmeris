@@ -42,16 +42,10 @@ research papers built on it.
 ```bash
 git clone https://github.com/kodzovee9/tekmeris && cd tekmeris
 pip install -e "./toolkit[dev]"
-pytest toolkit/tests -q          # expected: 38 passed, 1 skipped
+pytest toolkit/tests -q          # expected: 38 passed
 cd papers/P001-sut-to-sam/code
 python 15_netherlands_generate.py
 ```
-
-The suite contains 39 tests. One is an end-to-end check against a full
-third-party SAM that ships with a companion paper not yet released, so
-that input is not part of this repository and the test skips itself —
-hence `38 passed, 1 skipped` rather than 39. The skip marks a missing
-optional input, not a failure; every other test runs.
 
 The Dutch generation runs entirely from data committed in this
 repository (three registered Eurostat JSON responses); only the initial

@@ -45,7 +45,8 @@ Auditing of National Social Accounting Matrices}
 national social accounting matrices (SAMs) from official statistics
 under a discipline not yet systematically embedded in commonly
 distributed SAM construction workflows: accounting identities are
-enforced as executable checks at ingestion, classification is never
+enforced as executable checks at ingestion and at subsequent pipeline
+boundaries, classification is never
 inferred silently from labels or code conventions, every balancing
 adjustment is logged at
 the cell where it acts, and every run writes a validation report that
@@ -197,7 +198,7 @@ Module & Key callables & Role \\
 \texttt{data.eurostat} & \texttt{read\_jsonstat}, \texttt{EurostatTable} & dissemination-API responses \\
 \texttt{data.concordance} & \texttt{Concordance} & mappings with completeness validation \\
 \texttt{model.accounts} & \texttt{AccountSet}, \texttt{AccountKind} & explicit taxonomy, coverage assertions \\
-\texttt{model.balancing} & \texttt{ras}, \texttt{BalanceResult} & RAS with per-cell factor diagnostics \\
+\texttt{model.balancing} & \texttt{ras}, \texttt{gras}, \texttt{BalanceResult} & RAS and GRAS with per-cell factor diagnostics \\
 \texttt{report.workbook} & \texttt{add\_matrix\_sheet}, \texttt{add\_table\_sheet} & live-formula Excel artefacts \\
 \texttt{pipeline.eurostat\_sam} & \texttt{fetch}, \texttt{generate}, \texttt{balance} & macro-SAM generation (ESA countries) \\
 \texttt{pipeline.audit} & \texttt{audit}, \texttt{read\_kinds} & structural and macro-controls auditing \\
@@ -252,17 +253,15 @@ Adjustment factors: 70 cells in [0.9832, 1.0282]
 
 \subsection{Quality Control}
 
-Three layers. First, a \texttt{pytest} suite (39 tests at the tagged
+Three layers. First, a \texttt{pytest} suite (38 tests at the tagged
 release) in which the accounting identities are the test cases, covering
 the readers, the classification and tiling machinery, RAS and GRAS
 diagnostics, the audit pipeline, the cross-producer reconciliation
 reporter, and end-to-end generation and balancing on a
-synthetic two-industry economy whose identities close exactly. One of the
-39 is an end-to-end check against a full third-party SAM that ships with
-a companion paper not yet released, so that input is absent from the
-public repository and the test skips itself: a reviewer sees 38 passed
-and 1 skipped, which the README states and explains. Line
-coverage is 93\,per\,cent overall (84--99\,per\,cent per implemented
+synthetic two-industry economy whose identities close exactly. Every
+test runs from inputs shipped in the archive, so a reviewer sees
+\texttt{38 passed}. Line
+coverage is 93\,per\,cent overall (84--100\,per\,cent per implemented
 module; \texttt{pytest toolkit/tests -{}-cov=toolkit/src/edikit}); this
 measures which code paths are exercised, while the identity-based and
 end-to-end tests carry the evidence of domain correctness. A
@@ -313,8 +312,8 @@ Netherlands & benchmark-free generation and balancing & zero identity
 findings (65/65 industries and products); all residuals attributed,
 each $\leq$1.5\% of GDP; balanced to $<$EUR~0.01m at full precision
 with factors in $[0.9832, 1.0282]$ \\
-Austria & unchanged transfer run & zero identity findings; residuals
-$\leq$0.6\% of GDP \\
+Austria & transferability: the same generator rerun unchanged on a new
+country & zero identity findings; residuals $\leq$0.6\% of GDP \\
 Poland & suppression stress test & withheld cells detected (leaf detail
 covers 96.7\% of gross output); macro accounts anchored to published
 totals; residuals $\leq$1.1\% of GDP \\
@@ -387,13 +386,10 @@ directly. Standard RAS requires a non-negative seed. The Eurostat
 pipeline applies an explicitly reported sign-normalisation rule to the
 limited negative flows it encounters, and refuses inputs it cannot
 handle that way; matrices with general negative entries should use GRAS
-instead. The toolkit does
-not implement cross-entropy balancing against an arbitrary prior. Under
-the standard entropy formulation with fully specified row and column
-margins and compatible support, cross-entropy adjustment is closely
-related to biproportional RAS \cite{robinson2001}; the unimplemented gap
-is most relevant where margins are partial or additional constraints are
-imposed. The automatic Eurostat workflow produces a
+instead. The toolkit does not implement general cross-entropy balancing
+against an arbitrary prior \cite{robinson2001}, which matters most where
+margins are partial or additional constraints are imposed. The automatic
+Eurostat workflow produces a
 macro SAM, not a fully disaggregated multi-sector and household SAM.
 Adaptation outside the Eurostat universe requires country-specific
 source readers and mappings. Statistical confidentiality can prevent
@@ -435,7 +431,7 @@ Kodzovi Abalo: conceptualisation, software design and development,
 validation, writing.
 
 \section*{Acknowledgements}
-The toolkit's validation relied on the openly distributed data of
+The toolkit's validation relied on data published or distributed by
 Statistics South Africa, the South African Reserve Bank, the Kenya
 National Bureau of Statistics, IFPRI, UNU-WIDER, and Eurostat; the
 unusually thorough documentation of the UNU-WIDER 2019 South African SAM
