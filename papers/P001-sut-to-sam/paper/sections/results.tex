@@ -29,7 +29,7 @@ Capital split (6 types) & activity--type shares & median 0.18pp; 73.6\% within 1
 Occupation split (10) & activity--occupation shares & median 0.04pp; 88.7\% within 1pp \\
 Household groups (14) & wage-income anchor & mean 0.74pp; max 1.9pp \\
 Full matrix (209 accounts) & 6{,}732 comparable cells & 62.5\% equal within R0.5m \\
-Balanced SAM (v0.2) & max account imbalance & R7m; RAS factors in $[0.91, 1.14]$ \\
+Balanced SAM (v0.2) & max account imbalance & R7m; RAS factors in $[0.907, 1.143]$ \\
 \midrule
 Non-public inputs & count; priced effect of proxy & 1; mtx $+16.1$\%, stx $-1.5$\% \\
 Divergences (record vs.\ data) & catalogued in five classes & 8 (Sec.~\ref{sec:discussion}; App.~\ref{app:evidence}) \\
@@ -50,9 +50,12 @@ exports 97/97, fixed capital formation 21/21, and
 inventories-plus-residual 102/102---316/316 in all,
 confirming that the benchmark's stock-change account absorbs the use
 table's residual column). The benchmark matrix itself is exactly balanced
-(maximum $|$row$-$column$|$ gap below R0.001~million across its 209
-accounts), and its Table~2 macro SAM equals, cell for cell, the kind-level
-aggregation we compute independently from the distributed workbook.
+(maximum $|$row$-$column$|$ gap below R0.001~million across the 210
+accounts of its distributed matrix; the comparison below is on the 209
+accounts of our rebuild). For the macro comparison of
+Section~\ref{sec:results:macro} the benchmark is aggregated to the
+technical note's Table-2 accounts, the margin account consolidating away
+exactly.
 
 Three discrepancies had to be resolved to get there, and each is a finding
 about naming rather than about numbers. The account \texttt{atx} carries an
@@ -74,7 +77,10 @@ position relative to the technical note's authoritative list.
 Evaluating the technical note's 46 macro cell formulas over the December
 2022 SARB Quarterly Bulletin series reproduces 43 of the 45 computable
 cells exactly; all 45 are within 1\,per\,cent and the largest deviation is
-0.139\,per\,cent. Getting there required three corrections that are
+0.139\,per\,cent. (Of the 46 cells, 43 evaluate directly from KBP-series
+formulas and two are defined residually from the others---together the 45
+``computable'' cells---while the 46th depends on the unpublished customs
+input priced below.) Getting there required three corrections that are
 themselves results:
 
 \begin{itemize}
@@ -119,8 +125,9 @@ unpublished customs figure with the public series KBP4590J.}
 
 \textbf{Capital.} The technical note specifies neither the AFS edition nor
 the stock measure behind its six-way capital split. Grid-testing editions
-$\times$ carrying-value columns identifies \emph{2019 revised, closing
-values} as the construction basis (median share deviation 0.18~percentage
+$\times$ carrying-value columns leaves \emph{2019 revised, closing
+values} as the only candidate in the grid consistent with the benchmark
+(median share deviation 0.18~percentage
 points; 73.6\,per\,cent of activity--type shares within 1pp), against
 0.72pp for the preliminary edition that the AFS 2019 publication page
 supplies by default. Residual outliers are concentrated and interpretable:
@@ -152,16 +159,21 @@ domestic-worker occupation---because a parser assumed three-digit industry
 codes. The pipeline's coverage assertion caught it; conventions failed
 symmetrically on both sides of the audit.
 
-\textbf{Households.} Two dictionary-free anchors identify the benchmark's
-group definition as \emph{household-level} expenditure deciles (top decile
+\textbf{Households.} Two dictionary-free anchors test the benchmark's
+group definition, and they disagree---informatively. The wage-income
+anchor identifies \emph{household-level} expenditure deciles (top decile
 in five 2\,per\,cent bands): under that definition the LCS wage-income
 distribution matches the benchmark's labour-to-household block at mean
-0.74pp (max 1.9pp), while per-capita grouping fits markedly worse. The
-consumption anchor, by contrast, fits poorly under the identified
-household-level grouping (up to 5.9pp)---as the
-note itself explains, its consumption shares were carried over from an
-earlier SAM rather than recomputed from the LCS: inherited provenance that
-a fresh, documented build cannot and should not reproduce.
+0.74pp (max 1.9pp), while per-capita grouping fits markedly worse (mean
+1.8pp, max 7.9pp). The consumption anchor cannot corroborate it: it fits
+poorly under the household-level grouping (up to 5.9pp) and in fact sits
+closer to the per-capita alternative (mean 0.71pp against 1.46pp). The
+note itself explains why the consumption block is uninformative here: its
+consumption shares were carried over from an earlier SAM rather than
+recomputed from the LCS---inherited provenance that a fresh, documented
+build cannot and should not reproduce, and that decouples the consumption
+pattern from whichever grouping the income side uses. The identification
+therefore rests on the wage anchor alone.
 
 Table~\ref{tab:occ} details the occupation system by occupation, and
 Figure~\ref{fig:ecdf} plots the full distribution of share deviations for
@@ -200,7 +212,7 @@ composition is the one place our obtainable inputs are coarser than the
 benchmark's item-level survey work. Balancing the household income block by
 RAS---payer totals and group outlays held fixed as documented targets---
 closes the household imbalance to R0.06~million with adjustment factors
-confined to $[0.91, 1.14]$, leaves every other account within
+confined to $[0.907, 1.143]$, leaves every other account within
 R7~million---under 0.0002\,per\,cent of GDP, and the sense in which
 ``balanced'' is used throughout---and moves the block slightly
 \emph{toward} the benchmark's item-based values. The result, SAM v0.2, ships as a workbook whose totals and balance

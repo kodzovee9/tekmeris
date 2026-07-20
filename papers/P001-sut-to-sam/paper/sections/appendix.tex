@@ -62,8 +62,9 @@ Formula signs (intra-enterprise cell) & exhaustive $3^6$ grid; runner-up
 misses by R2.5bn & unique within tested grid \\
 Capital-split vintage and measure & edition $\times$ measure grid
 (0.18pp vs 0.72pp) & unique within tested grid \\
-Household grouping variable & two dictionary-free anchors &
-unique within tested definitions \\
+Household grouping variable & wage-income anchor (the consumption
+anchor is uninformative: inherited shares) & unique within tested
+definitions \\
 R596m government--enterprise edit & balance-preserving minimal-edit
 pattern; vintage test refuted & consistent with \\
 Customs input (\texttt{mtx}/\texttt{stx}) & note's own statement;
@@ -100,9 +101,14 @@ receipts-minus-payments residual and every institution's net position;
 it changes only the gross flows' side of the ledger, and both flips have
 the natural economic reading (the Netherlands is a net \emph{recipient}
 of capital income from abroad). RAS requires a non-negative seed, so the
-alternative would be GRAS; normalisation is preferred because it makes
-the negativity explicit and reviewable rather than absorbing it into a
-generalised algorithm.
+alternative would be GRAS \citep{junius2003}; normalisation is preferred
+\emph{at this scale} because it makes the negativity explicit and
+reviewable, two cells being small enough to inspect individually. The
+preference does not generalise: a full SAM carries structural negatives
+throughout (subsidies, negative saving, inventory changes), and
+transposing each one would rearrange the matrix away from the
+conventional layout. For that case GRAS is the appropriate instrument,
+and the toolkit implements it.
 
 \emph{Target vector.} RAS needs one target per account. The generated
 matrix supplies two candidates---each account's receipts and its

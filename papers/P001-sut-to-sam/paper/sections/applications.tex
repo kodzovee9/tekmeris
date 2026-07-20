@@ -67,15 +67,23 @@ proposal addresses.
 \input{tables/tab_kenya}
 \end{table}
 
-\emph{Cell-level audit is blocked by publication practice, not by
+\emph{Cell-level audit is bounded by publication practice, not by
 method.} The SAM's supply--use core descends from KNBS's 2009 benchmark
 tables, whose full balanced database (151 products by 81 industries) is,
 per the Economic Survey, available from KNBS on request but published only
-as condensed print tables. The pipeline that reproduced South Africa's
-production block exactly would run unchanged on the Kenyan detail; what it
-lacks is a machine-readable input, not a method. That boundary---audit
-feasible in principle, blocked by format---defines the middle of the
-replicability spectrum.
+as condensed print tables. We did not request it, and the boundary tested
+here is therefore a specific one: what an auditor can verify from the
+public record alone, without privileged access or correspondence with the
+producer. That is the boundary a reader of a published SAM faces, and the
+one the paper's standards proposal addresses; an audit conducted on
+requested files would test a different and more permissive question. Two
+consequences follow. The Kenyan evidence below is confined to structure,
+grain, and macro controls---the depth the public record supports---and the
+claim that the South African pipeline would extend to the Kenyan detail
+remains untested: the reader for the KNBS layout, and its concordances,
+would still have to be written, even though the method behind them is
+unchanged. That boundary---audit feasible in principle, unreachable from
+what is published---defines the middle of the replicability spectrum.
 
 \subsection{The Netherlands: benchmark-free generation}
 \label{sec:applications:nl}
@@ -90,7 +98,11 @@ sequence of non-financial sector accounts (about 180~KB in total); a
 70-line JSON-stat reader added to the toolkit decodes them, and a single
 script assembles a macro accounting matrix and balances it into a macro
 SAM. No published SAM was consulted at any point during construction or
-validation.
+validation---though, as the results below make clear, that is a statement
+about SAMs and not a claim of independent verification: the checks
+available here are internal consistency and agreement with published
+national-accounts aggregates drawn from the same compilation system that
+supplies the inputs.
 
 Two results follow. First, \emph{the official tables are internally
 exact}: every identity the toolkit enforces---output and value-added
@@ -119,17 +131,25 @@ pension-fund adjustment D8, capital transfers D9, net lending B9, and the
 residents-abroad consumption adjustments) through explicit instrument
 accounts; GDP at basic prices emerges at EUR~724{,}960~million, on the
 published figure, and compensation of employees closes to the euro across
-four independent series. Table~\ref{tab:netherlands} reports the residual
+four series. Both agreements are internal to the Dutch national accounts:
+the four series and the published aggregate are outputs of one compilation
+system, so what they establish is that our assembly preserves CBS's own
+consistency, not that it is independently corroborated. Table~\ref{tab:netherlands} reports the residual
 of every account before balancing: twelve are exactly zero, and the six
 that are not are all below 1.5\,per\,cent of GDP and attach to known ESA
 boundary items (the domestic-versus-national concept in compensation,
 mixed-income attribution, capital-account detail). Consistent with the
 framework's first commitment, the residuals are published, not hidden;
 the balanced macro SAM is then produced by the toolkit's logged RAS
-step: it converges to a maximum residual below EUR~0.01~million with all
-70 adjustment factors inside $[0.983, 1.028]$, concentrated on the
-rest-of-world cells---exactly where the attributed residuals sat---and
-every factor ships with the matrix. The balancing choices (the treatment
+step: it converges to a maximum residual below EUR~0.01~million at full
+precision, with all 70 adjustment factors inside $[0.9832, 1.0282]$,
+concentrated on the rest-of-world cells---exactly where the attributed
+residuals sat---and every factor ships with the matrix. One caveat
+applies to the distributed artefact, and it is the same one this paper
+notes for the Kenyan file: the CSV prints values at EUR~0.1~million
+precision, so recomputing account residuals from the distributed file
+yields rounding imbalances of up to EUR~0.2~million; the full-precision
+matrix regenerates from the replication package. The balancing choices (the treatment
 of two negative cells, the target vector, and the choice of RAS), the
 invariants they preserve, and a target-vector sensitivity check are
 documented in Appendix~\ref{app:nlbalance}.
@@ -139,7 +159,7 @@ documented in Appendix~\ref{app:nlbalance}.
 \caption{Netherlands: account residuals of the generated 2019 macro
 accounting matrix, before balancing (no benchmark consulted; GDP at basic
 prices EUR 724{,}960m). The logged RAS step closes all residuals with
-adjustment factors in $[0.983, 1.028]$.}
+adjustment factors in $[0.9832, 1.0282]$.}
 \label{tab:netherlands}
 \input{tables/tab_netherlands}
 \end{table}

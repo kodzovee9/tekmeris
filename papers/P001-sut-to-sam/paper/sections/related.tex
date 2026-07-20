@@ -7,10 +7,20 @@ The SAM as an integrated accounting framework descends from
 \citet{stone1962} and was consolidated as a planning tool by
 \citet{pyattthorbecke1976} and \citet{pyattround1985}. The mechanics of
 reconciling inconsistent accounts are equally mature: biproportional (RAS)
-adjustment and its generalisations \citep{temurshoev2013}, and the
+adjustment and its generalisations---GRAS for matrices carrying negative
+entries \citep{junius2003,temurshoev2013}, KRAS where constraints
+conflict or differ in reliability \citep{lenzen2009}---and the
 cross-entropy estimation of \citet{robinson2001}, which remains the
 standard reference for SAM balancing under scattered and unequally reliable
-information. Compilation practice for the supply--use core is codified in
+information. Compilation \emph{practice}, as distinct from compilation
+mathematics, has its own literature: \citet{round2003} sets out the
+lessons and unresolved difficulties of building SAMs for policy analysis,
+and estimation manuals aimed at producers---most directly
+\citet{mainar2018}, the manual behind the European Commission's own
+African SAM programme---document the sequence of steps a compiler
+follows. What these do not do, and what this paper is about, is make the
+steps executable and the resulting artefact checkable against them.
+Compilation practice for the supply--use core is codified in
 the SNA and its handbooks \citep{un2009sna,un2018handbook,eurostat2008};
 the analytics that consume SAMs are surveyed by \citet{millerblair2009}
 and, for CGE databases, \citet{lofgren2002}. Operationally, most African
@@ -48,12 +58,27 @@ auditing unusually sharp. Within economics the paper joins the
 transparency and replication agenda \citep{christensen2018}, with that
 accounting twist: a SAM's identities give the auditor a powerful
 instrument, because any undocumented intervention must either break an
-identity or leave a biproportional fingerprint. To our knowledge, no
-existing system combines registered sources, executable identities,
-cell-level provenance, and logged balancing for national SAM
-construction---which is why, as Section~\ref{sec:related:workflow}
-argues, a full cell-level replication audit of a published national SAM
-appears not to have been undertaken before.
+identity or leave a biproportional fingerprint.
+
+The closest existing systems are the input--output virtual laboratories,
+of which the Australian Industrial Ecology Lab is the developed case
+\citep{lenzen2014}: registered source ``data packs'', scripted assembly,
+and constrained balancing under KRAS, built so that many analysts can
+compile tables collaboratively and regenerate them. The virtual-laboratory
+programme establishes most of what we assume here, and we claim no
+priority over it. Two things differ, and they are differences of purpose
+rather than sophistication. A virtual laboratory is built to
+\emph{construct} tables, so its provenance record is oriented to the
+build; our concern is the inverse operation---taking a matrix someone
+else published, with its own prose record, and testing whether that
+record reproduces it. And the laboratories serve environmental-economic
+MRIO accounts, where the reference artefact is the database itself,
+rather than the nationally published SAM whose documentation is the
+object of audit. What we have not found is a published, cell-level
+replication of a national SAM \emph{from its own stated sources}; if such
+an audit exists we would welcome the correction, since the paper's
+argument is strengthened, not weakened, by evidence that the exercise is
+feasible more often than the record suggests.
 
 \subsection{Why current workflows resist reproduction}
 \label{sec:related:workflow}
