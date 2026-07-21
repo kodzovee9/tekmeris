@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "edikit"
-version = "0.2.4"
+version = "0.2.5"
 description = "Reproducible construction and auditing of social accounting matrices from official statistics"
 readme = "README.md"
 license = "Apache-2.0"
