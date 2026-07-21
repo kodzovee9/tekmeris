@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "edikit"
-version = "0.2.1"
+version = "0.2.3"
 description = "Reproducible construction and auditing of social accounting matrices from official statistics"
 license = {file = "LICENSE"}
 requires-python = ">=3.11"
