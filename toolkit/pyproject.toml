@@ -4,13 +4,38 @@ build-backend = "hatchling.build"
 
 [project]
 name = "edikit"
-version = "0.2.3"
+version = "0.2.4"
 description = "Reproducible construction and auditing of social accounting matrices from official statistics"
-license = {file = "LICENSE"}
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
+authors = [{name = "Kodzovi Abalo"}]
+keywords = [
+    "social accounting matrix", "SAM", "supply and use tables",
+    "input-output", "national accounts", "RAS", "GRAS",
+    "reproducibility", "provenance", "Eurostat",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 dependencies = [
     "openpyxl",
 ]
+
+[project.urls]
+Homepage = "https://github.com/kodzovee9/tekmeris"
+Repository = "https://github.com/kodzovee9/tekmeris"
+Issues = "https://github.com/kodzovee9/tekmeris/issues"
+Archive = "https://doi.org/10.5281/zenodo.21419195"
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-cov"]
@@ -24,3 +49,12 @@ replicate = ["xlrd", "matplotlib"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/edikit"]
+
+# The published test suite is the 38 tests that all run. The P002 Senegal
+# integration test needs the JRC matrix, which is held with that
+# unreleased paper and is absent from the public repository (see the
+# matching exclusion in scripts/sync-public.sh). Shipping it in the sdist
+# would hand anyone who installs from PyPI a test that can only skip, and
+# a loose end they cannot resolve. S001 describes the 38-test suite.
+[tool.hatch.build.targets.sdist]
+exclude = ["tests/test_p002_*.py"]
