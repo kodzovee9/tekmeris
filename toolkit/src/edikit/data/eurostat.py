@@ -20,6 +20,7 @@ class EurostatTable:
     dims: list[str]
     categories: dict[str, list[str]]           # dim -> codes in position order
     labels: dict[str, dict[str, str]]          # dim -> code -> label
+    updated: str = ""                          # the dataset's vintage stamp
     values: dict[tuple[str, ...], float] = field(default_factory=dict)
 
     def slice(self, **fixed: str) -> dict[tuple[str, ...], float]:
@@ -50,7 +51,8 @@ def read_jsonstat(path: str) -> EurostatTable:
         order = sorted(cat["index"], key=lambda c: cat["index"][c])
         categories[dim] = order
         labels[dim] = dict(cat.get("label", {}))
-    table = EurostatTable(label=d.get("label", ""), dims=dims,
+    table = EurostatTable(label=d.get("label", ""), updated=d.get("updated", ""),
+                          dims=dims,
                           categories=categories, labels=labels)
     for lin_str, v in d["value"].items():
         if v is None:

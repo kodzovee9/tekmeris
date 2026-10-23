@@ -1,100 +1,111 @@
 # Build recipe
 
-Build a validated macro social accounting matrix from public data with one
-command — no benchmark SAM, no spreadsheet, no manual download.
+Generate a balanced macro social accounting matrix from Eurostat data with
+one command. No benchmark SAM, spreadsheet or manual download is needed.
 
 ```bash
-python build_sam.py --country AT --year 2019
+python build_sam.py --country DK --year 2019
 ```
 
-That fetches Austria's 2019 supply table, use table, and non-financial
-sector accounts from the Eurostat dissemination API (three requests,
-~200KB, cached in `data/`), generates an 18-account macro accounting matrix, balances it, and writes
-three files to `output/`:
+The command fetches Denmark's 2019 supply table, use table and non-financial
+sector accounts from the Eurostat dissemination API (three requests of about
+200 KB, cached in `data/`). It then generates an 18-account macro accounting
+matrix, balances it, and writes three files to `output/`:
 
-- `AT_2019_macro_sam.csv` — the pre-balancing matrix in long form
-  (row, col, EUR million), with every account residual attributed in the
-  report
-- `AT_2019_macro_sam_balanced.csv` — the balanced macro SAM, carrying the
-  RAS adjustment factor of every cell
-- `AT_2019_generation.md` — the validation report
+- `DK_2019_macro_sam.csv` is the matrix before balancing, in long form (row,
+  col, EUR million).
+- `DK_2019_macro_sam_balanced.csv` is the balanced matrix with the RAS
+  adjustment factor of every cell. A `note` column marks closing entries and
+  cells flipped from a negative.
+- `DK_2019_generation.md` is the validation report.
 
-The harmonised workflow is designed for countries in the ESA 2010
-transmission programme with the required Eurostat tables. The committed
-[COVERAGE.md](COVERAGE.md) records a full sweep of 37 candidate
-countries for 2019 — which generate and balance cleanly, which carry
-diagnostics needing review, and which the datasets do not cover —
-regenerate it with `python sweep.py`. Requires Python 3.11+; no packages beyond the standard
-library and `edikit` (this repository, no install needed — the script
-finds it relatively). If the download fails with an SSL certificate
-error (common with macOS framework Python), `pip install certifi` and
-rerun.
+Options:
 
-Countries whose tables carry suppressed (confidential) cells — Poland,
-for example — still work: the macro SAM anchors to the published totals,
-and the report quantifies exactly how much detail is withheld and which
-identity checks that suppression touches.
+| Option | Effect |
+|---|---|
+| `--targets {mean,receipts,payments}` | Sets the balancing target per account (default `mean`). |
+| `--decimals N` | Sets the CSV rounding, in decimal places of EUR million (default 1). |
 
-## What you get, and what the checks mean
+The workflow covers country-years in the ESA 2010 transmission programme
+with the required Eurostat tables. [COVERAGE.md](COVERAGE.md) records a sweep
+of 37 candidate countries for 2019 and the data vintages it used. Eurostat
+revises these datasets, so outcomes can change on later data; regenerate the
+table with `python sweep.py`. `examples/` holds five runs with their inputs,
+which reproduce offline.
+
+Requires Python 3.11+ and edikit. If the download fails with an SSL
+certificate error (common with macOS framework Python), run
+`pip install certifi` and try again.
+
+## What the report shows
 
 The generation is *benchmark-free*: nothing is copied from any published
-SAM. Correctness therefore rests on the accounting identities the pipeline
-enforces, all reported in `*_generation.md`:
+SAM. The report records what the checks found. Recording a finding does not
+fix it, and accounting consistency does not make the matrix economically
+right for a given model.
 
-1. **Supply-use identities** — output and value-added identities for every
-   industry, the import identity, and the supply-demand balance of every
-   product, each at a EUR 1m tolerance. For a well-maintained statistical
-   system these close exactly; any finding is listed.
-2. **Account residuals** — every account's row total minus column total,
-   in EUR and as a share of GDP. The production, tax, capital, and
-   instrument accounts close exactly by construction; the institutional
-   accounts (households, corporations, government, labour, rest of world,
-   savings-investment) typically carry residuals of a fraction of a
-   percent of GDP that attach to known ESA boundary items (the
-   domestic-vs-national concept in compensation, mixed-income attribution,
-   capital-account detail). They are **reported, not balanced away** — if
-   you need an exactly balanced matrix, apply the RAS routine in
-   `edikit.model.balancing`, which logs the adjustment factor of every
-   cell it touches.
+1. **Supply-use identities.** For every industry, the output and
+   value-added identities; the import identity; and the supply-demand balance
+   of every product, each at a EUR 1m tolerance. Every finding is listed.
+   Where cells are suppressed, findings can reflect the suppression rather
+   than errors.
+2. **Unpublished inputs.** Sector-account items the source publishes on
+   neither side are used as zero and listed. Any account they feed is
+   unreliable.
+3. **Cross-source consistency.** Several aggregates are measured by both the
+   supply-use tables and the sector accounts: gross value added,
+   compensation, operating surplus and household consumption. The report shows
+   both measurements and the vintage of each dataset.
+4. **Account residuals.** Every account's receipts minus payments, with the
+   items computed from the inputs that bear on each residual:
+   - cross-source gaps;
+   - net capital transfers, which the account design leaves in the
+     institutions' accounts;
+   - taxes collected by the rest of the world;
+   - non-produced assets.
 
-The design rules behind the account structure (N1–N4: instrument accounts
-for inter-institutional flows, sector definitions, the import identity as
-cross-check, explicit routing of the residents-abroad and cif/fob
-adjustment rows) are documented in `edikit/pipeline/eurostat_sam.py` and
-in the accompanying working paper.
+   The report also shows what those items leave unexplained.
+5. **The closing entry.** The capital factor account is closed by a residual
+   booked against the rest of the world. That residual measures the
+   difference between the two datasets' operating-surplus figures, and it
+   also appears in the rest-of-world residual.
+6. **Balancing.** The report gives convergence, flipped cells, the range of
+   adjustment factors, and GDP before and after balancing.
 
-## Adapting beyond Eurostat
+The design rules behind the account structure are documented in
+`edikit/pipeline/eurostat_sam.py`. They cover instrument accounts for
+inter-institutional flows, sector definitions, the import identity as a
+cross-check, and the routing of the residents-abroad and cif/fob
+adjustment rows.
 
-For a country outside the ESA transmission programme, the API stage is
-replaced by your country's published files; everything downstream reuses
-the same toolkit machinery. The working paper's South Africa pipeline
-(`papers/P001-sut-to-sam/code/`, scripts 01–12) is the worked example of the
-full pattern:
+## Beyond Eurostat
 
-1. **Register your sources** — every raw file with vintage, URL, and
-   SHA-256 hash (see `papers/P001-sut-to-sam/data/SOURCES.md` for the format).
-2. **Read and verify the SUT** — `edikit.data.sut` shows the pattern for
-   an Excel-published supply-use table: recompute embedded totals, enforce
-   the output/VA/supply identities before using a single number.
-3. **Classify explicitly** — never by code prefix or label; build one
-   reviewable account-classification table with a coverage assertion
-   (`edikit.model.accounts`). The paper documents what happens otherwise.
-4. **Institutional cells as formulas** — transcribe your national-accounts
-   sources into a machine-readable formula table (one row per SAM cell)
-   rather than hand-copying numbers; see the South African KBP formula
-   table for the pattern.
-5. **Balance with a log** — `edikit.model.balancing` (RAS with per-cell
-   factor diagnostics), and publish the factors with the matrix.
+Outside a harmonized statistical system, building a SAM is a different and
+larger job. It needs readers for the national sources, mappings from their
+classifications to SAM accounts, rules for allocating flows the sources do
+not report, and decisions about conflicting sources. edikit supplies the
+parts that transfer: explicit classification, concordances, balancing with a
+per-cell log, source verification, and live-formula workbooks. The economic
+decisions remain the analyst's.
 
-The one rule that carries the whole kit: **every choice a reader cannot
-see is a choice they cannot check.** Register sources, enforce identities,
-report residuals.
+The companion paper's South Africa scripts (`papers/P001-sut-to-sam/code/`)
+are one worked instance of those decisions. They show the shape of the work,
+not settings to change for another country. For example:
+
+- sources registered in `SOURCES.md`, with a `SOURCES.sha256` manifest that
+  `edikit.data.provenance.verify_sources` checks;
+- a reader for one publisher's SUT layout (`edikit.data.sut`), whose
+  `check_*` functions report identity findings;
+- one reviewable account-classification table, applied with
+  `edikit.model.accounts.classify_by_prefix`, which raises on an unmatched
+  code;
+- institutional cells transcribed as formulas rather than copied numbers;
+- balancing with the factor of every cell published.
 
 ## Extending the macro SAM
 
-The macro SAM is deliberately the common denominator. Disaggregation —
-industries and products (the API serves the full 65×65 core), household
-groups from a budget survey, occupational labour from a labour-force
-survey — follows the South African scripts 07–11 pattern: survey-based
-share systems applied under numbered, disclosed rules, then a logged
-balancing step.
+The macro SAM is a common denominator, not a SAM ready for a particular
+model. Disaggregating it by industry and product (the API serves the full
+65-industry core), by household group from a budget survey, or by occupation
+from a labor-force survey requires survey-based allocation rules and a
+further balancing step.

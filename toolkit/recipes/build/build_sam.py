@@ -35,6 +35,17 @@ def main() -> None:
     ap.add_argument("--data-dir", default="data",
                     help="where raw API responses are stored (default: data/)")
     ap.add_argument("--out-dir", default="output")
+    ap.add_argument("--targets", choices=("mean", "receipts", "payments"),
+                    default="mean",
+                    help="balancing target per account: the mean of its "
+                         "receipts and payments (default), or either side "
+                         "alone. Rerun with each to see how sensitive the "
+                         "balanced matrix is to this choice.")
+    ap.add_argument("--decimals", type=int, default=1,
+                    help="decimal places of EUR million in the CSVs "
+                         "(default 1); the matrix balances in memory to the "
+                         "solver's tolerance, and in the CSV only to this "
+                         "rounding")
     args = ap.parse_args()
 
     print(f"fetching {args.country} {args.year} (cached files reused)...")
@@ -44,11 +55,17 @@ def main() -> None:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
     stem = f"{args.country}_{args.year}"
-    bal, flipped = eurostat_sam.balance(res)
-    eurostat_sam.write_csv(res, out / f"{stem}_macro_sam.csv")
-    eurostat_sam.write_balanced_csv(bal, out / f"{stem}_macro_sam_balanced.csv")
+    if args.targets != "mean":
+        stem += f"_{args.targets}"          # keep sensitivity runs side by side
+    bal, flipped = eurostat_sam.balance(res, targets=args.targets)
+    eurostat_sam.write_csv(res, out / f"{stem}_macro_sam.csv",
+                           decimals=args.decimals)
+    eurostat_sam.write_balanced_csv(bal, out / f"{stem}_macro_sam_balanced.csv",
+                                    decimals=args.decimals,
+                                    flipped=flipped, plugs=res.plugs)
     eurostat_sam.write_report(res, out / f"{stem}_generation.md",
-                              balance=bal, flipped=flipped)
+                              balance=bal, flipped=flipped,
+                              targets=args.targets)
 
     print(f"industries {len(res.inds)}; products {len(res.prods)}; "
           f"identity findings {len(res.findings)}; "

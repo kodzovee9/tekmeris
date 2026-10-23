@@ -69,6 +69,16 @@ class Finding:
     detail: str
 
 
+def _refuse_duplicates(codes: list[str], what: str, where: str) -> None:
+    """A repeated code would overwrite earlier cells silently."""
+    seen, dup = set(), set()
+    for c in codes:
+        (dup if c in seen else seen).add(c)
+    if dup:
+        raise ValueError(f"{where}: {what} codes appear more than once: "
+                         f"{sorted(dup)}")
+
+
 def read_industry_list(path: str) -> list[Industry]:
     wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
     rows = list(wb["Industry List"].iter_rows(values_only=True))
@@ -99,6 +109,8 @@ def read_supply_table(path: str, year: int) -> SupplyTable:
         if _INDUSTRY_CODE.match(code):
             industry_cols[j] = code
 
+    _refuse_duplicates(list(industry_cols.values()), "industry",
+                       f"{path} [Supply Table {year}]")
     products: list[Product] = []
     table = SupplyTable(
         year=year,
@@ -117,6 +129,9 @@ def read_supply_table(path: str, year: int) -> SupplyTable:
                 if isinstance(r[j], (int, float)):
                     table.embedded_output_totals[icode] = float(r[j])
             continue
+        if any(pr.code == code for pr in products):
+            raise ValueError(f"{path} [Supply Table {year}]: product code "
+                             f"{code!r} appears more than once")
         products.append(Product(code=code, sic=str(r[1] or "").strip(), description=desc))
         if isinstance(r[3], (int, float)):
             table.total_supply_purchasers[code] = float(r[3])
@@ -220,6 +235,8 @@ def read_use_table(path: str, year: int) -> UseTable:
         if _INDUSTRY_CODE.match(code):
             industry_cols[j] = code
     trailing_cols: dict[int, str] = {}
+    _refuse_duplicates(list(industry_cols.values()), "industry",
+                       f"{path} [Use Table {year}]")
     if industry_cols:
         for j in range(max(industry_cols) + 1, len(h2)):
             lab = str(h2[j] or "").strip()
@@ -241,6 +258,9 @@ def read_use_table(path: str, year: int) -> UseTable:
         desc = str(r[2] or "").strip()
         label2 = str(r[1] or "").strip()
         if _PRODUCT_CODE.match(code) and desc:
+            if any(pr.code == code for pr in table.products):
+                raise ValueError(f"{path} [Use Table {year}]: product code "
+                                 f"{code!r} appears more than once")
             table.products.append(Product(code=code, sic=label2, description=desc))
             if isinstance(r[3], (int, float)):
                 table.total_supply_purchasers[code] = float(r[3])

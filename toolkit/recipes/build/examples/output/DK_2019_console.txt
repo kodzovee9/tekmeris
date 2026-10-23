@@ -1,0 +1,11 @@
+fetching DK 2019 (cached files reused)...
+industries 65; products 65; identity findings 0; commodity closure 65/65
+macro SAM: 18 accounts, GDP(bp) EUR 268,552m
+  corp          +538  (+0.20% GDP)
+  hhd           -412  (-0.15% GDP)
+  gvt           -316  (-0.12% GDP)
+  row           +307  (+0.11% GDP)
+  si            -115  (-0.04% GDP)
+  d4x             -1  (-0.00% GDP)
+balanced: converged=True; max |factor-1| 1.18%; flipped [('d9', 'corp')]
+written: examples/output/DK_2019_macro_sam.csv, examples/output/DK_2019_generation.md

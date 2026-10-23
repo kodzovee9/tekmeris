@@ -35,6 +35,7 @@ def main() -> None:
     args = ap.parse_args()
 
     rows = []
+    vintages: set[str] = set()   # "updated" stamps of every dataset used
     for cc in args.countries.split(","):
         cc = cc.strip()
         res = None
@@ -60,6 +61,7 @@ def main() -> None:
             if worst > 5.0 or bal.max_factor_deviation() > 1.0:
                 status = "requires-review"
             elif (res.findings or res.cross_diffs or res.coverage
+                  or res.missing_inputs
                   or res.n_closed < len(res.prods) or res.n3_check > 1.0
                   or not bal.converged):
                 status = "generates-with-caveats"
@@ -71,7 +73,10 @@ def main() -> None:
                          f"closure {res.n_closed}/{len(res.prods)}; "
                          f"worst residual {worst:.1f}% GDP; balanced "
                          f"max |f-1| {bal.max_factor_deviation() * 100:.1f}%"
-                         + supp))
+                         + supp
+                         + (f"; not published: {', '.join(res.missing_inputs)}"
+                            if res.missing_inputs else "")))
+            vintages.update(v for v in res.vintages.values() if v)
             print(f"{cc}: {status}")
         except Exception as e:  # record the failure, keep sweeping
             reason = f"{type(e).__name__}: {str(e)[:110]}"
@@ -98,14 +103,16 @@ def main() -> None:
     tiers = ["passes-core-checks", "generates-with-caveats",
              "requires-review", "partial", "unavailable", "fail"]
     n = {t: sum(1 for _, st, _ in rows if st == t) for t in tiers}
-    with open(args.out, "w") as f:
+    with open(args.out, "w", encoding="utf-8", newline="\n") as f:
         f.write(f"# Country coverage, {args.year}\n\nGenerated "
                 f"by recipes/build/sweep.py over {len(rows)} candidate "
                 f"countries: {n['passes-core-checks']} pass every core check "
                 f"(zero identity findings, full commodity closure, no "
                 f"cross-table differences, import identity within tolerance, "
-                f"no suppression, converged balancing, worst residual within "
-                f"5% of GDP); {n['generates-with-caveats']} generate and "
+                f"no suppression, no unpublished sector-account items, "
+                f"converged balancing, worst residual within 5% of GDP, "
+                f"every factor within 100% of one); "
+                f"{n['generates-with-caveats']} generate and "
                 f"balance with documented caveats; {n['requires-review']} "
                 f"carry large residuals or extreme factors and require "
                 f"review; {n['partial']} generate but cannot be balanced; "
@@ -113,7 +120,11 @@ def main() -> None:
                 f"datasets"
                 + (f"; {n['fail']} fail otherwise" if n['fail'] else "")
                 + ".\n\n"
-                f"| Country | Outcome | Detail |\n|---|---|---|\n")
+                + (f"Eurostat dataset vintages used (\"updated\" stamps): "
+                   f"{min(vintages)[:10]} to {max(vintages)[:10]}. The "
+                   f"outcomes depend on these vintages; rerunning on later "
+                   f"data can change them.\n\n" if vintages else "")
+                + "| Country | Outcome | Detail |\n|---|---|---|\n")
         for cc, st, detail in rows:
             f.write(f"| {cc} | {st} | {detail} |\n")
         f.write("\nFailures are properties of source availability for the "

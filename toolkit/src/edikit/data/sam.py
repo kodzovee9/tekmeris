@@ -68,6 +68,11 @@ def read_labeled_matrix(path: str, sheet_name: str) -> LabeledMatrix:
         if lab:
             col_map[j] = lab
 
+    dup_cols = sorted({c for c in col_map.values()
+                       if list(col_map.values()).count(c) > 1})
+    if dup_cols:
+        raise ValueError(f"{sheet_name}: column labels appear more than "
+                         f"once: {dup_cols}")
     m = LabeledMatrix(row_accounts=[], col_accounts=list(col_map.values()))
     for r in rows[header_idx + 1 :]:
         lab = str(r[0] or "").strip()
@@ -79,6 +84,9 @@ def read_labeled_matrix(path: str, sheet_name: str) -> LabeledMatrix:
                 if isinstance(v, (int, float)):
                     m.embedded_col_totals[c] = float(v)
             continue
+        if lab in m.row_accounts:
+            raise ValueError(f"{sheet_name}: row label {lab!r} appears more "
+                             f"than once")
         m.row_accounts.append(lab)
         for j, c in col_map.items():
             if is_totals_label(c):

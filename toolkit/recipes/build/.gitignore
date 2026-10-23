@@ -1,2 +1,4 @@
-data/
-output/
+# Anchored to this directory: unanchored patterns also matched
+# examples/output/ and silently kept the worked examples out of git.
+/data/
+/output/

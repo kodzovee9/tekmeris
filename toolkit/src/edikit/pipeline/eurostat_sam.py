@@ -43,6 +43,13 @@ from ..data.eurostat import read_jsonstat
 from ..model.balancing import BalanceResult, ras
 
 API = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data"
+# How far the leaf-industry sum may exceed the published TOTAL before the
+# partition is treated as double counting. Not zero, because some sources'
+# own detail exceeds their published total (Denmark 2019, +1.7% in an
+# earlier release). A double count of a section smaller than this would pass
+# undetected; the manuscript states the tolerance for that reason.
+TILING_TOLERANCE = 0.05
+
 DATASETS = {
     "supply": ("naio_10_cp15", {"unit": "MIO_EUR", "stk_flow": "TOTAL"}),
     "use": ("naio_10_cp16", {"unit": "MIO_EUR", "stk_flow": "TOTAL"}),
@@ -148,6 +155,23 @@ class MacroSAMResult:
     # aggregate -> leaf-detail share of the published total, where the two
     # differ: <1.0 means cells are suppressed/confidential in the source
     coverage: dict[str, float] = field(default_factory=dict)
+    # closing entries: cells whose value is a residual that makes an account
+    # close, not an observed flow. Recorded so every report can state them;
+    # an unreported plug would contradict "adjustment is never silent".
+    plugs: dict[tuple[str, str], float] = field(default_factory=dict)
+    # vintage stamp of each input dataset ("updated" in the JSON-stat file)
+    vintages: dict[str, str] = field(default_factory=dict)
+    # the same aggregate as measured by the supply-use tables and by the
+    # sector accounts: label -> (SUT value, sector-account value)
+    cross_source: dict[str, tuple[float, float]] = field(default_factory=dict)
+    # items computed from the inputs that bear on an account's residual:
+    # account -> [(description, value)]. Descriptive, not causal: the report
+    # flags an item as matching only when it equals the residual within 1m.
+    residual_items: dict[str, list[tuple[str, float]]] = field(
+        default_factory=dict)
+    # (item, sector) pairs the generator needed but the source publishes on
+    # neither side; each was used as zero
+    missing_inputs: list[str] = field(default_factory=list)
 
     @property
     def accounts(self) -> list[str]:
@@ -186,13 +210,20 @@ def generate(country: str, year: int,
     tiled = sum(scells.get((i, p), 0.0) for i in inds for p in prods)
     # gross overcounting means the partition double-counts - a bug;
     # small excesses occur where a source's own detail disagrees with its
-    # published TOTAL column (e.g. Denmark 2019, +1.7%), and undercounts
-    # mean suppressed cells - both are source properties, recorded as
+    # published TOTAL column (Denmark 2019, +1.7% in an earlier release), and
+    # undercounts mean suppressed cells - both are source properties, recorded as
     # coverage diagnostics, and the macro cells anchor to published totals
-    assert tiled - tot_ind <= max(0.05 * tot_ind, 1.0), \
-        f"industry partition double-counts: {tiled:,.0f} vs {tot_ind:,.0f}"
+    # Explicit raises rather than `assert`: Python strips asserts under -O,
+    # and a check the interpreter can silently drop is not a check.
+    if tiled - tot_ind > max(TILING_TOLERANCE * tot_ind, 1.0):
+        raise ValueError(
+            f"{country} {year}: industry partition double-counts: leaf sum "
+            f"{tiled:,.0f} exceeds the published total {tot_ind:,.0f} by more "
+            f"than {TILING_TOLERANCE:.0%}")
     missing = [i for i in inds if i not in use.categories["ind_use"]]
-    assert not missing, f"industries absent from use table: {missing}"
+    if missing:
+        raise ValueError(f"{country} {year}: industries absent from use "
+                         f"table: {missing}")
     uinds = inds
 
     coverage: dict[str, float] = {}
@@ -296,10 +327,22 @@ def generate(country: str, year: int,
     add("com", "row", fd_tot["P6"] - opnres_hh + adj_p6)
     add("row", "com", imp_adj)             # cif/fob adjustment on imports
 
+    # A value the source does not publish is used as zero, because a SAM
+    # cell must hold a number. Many sectors legitimately publish only one
+    # side of a flow (corporations pay but do not receive social benefits),
+    # so an item is recorded as missing only when a sector has no value on
+    # either side - the case that can collapse an account unexplained.
+    absent: set[tuple[str, str]] = set()
+    present: set[tuple[str, str]] = set()
+
     def n(item, sector, direct):
-        return nasa.value(freq="A", unit="CP_MEUR", direct=direct,
-                          na_item=item, sector=sector, geo=country,
-                          time=yr, default=0.0)
+        v = nasa.value(freq="A", unit="CP_MEUR", direct=direct,
+                       na_item=item, sector=sector, geo=country, time=yr)
+        if v is None:
+            absent.add((item, sector))
+            return 0.0
+        present.add((item, sector))
+        return v
 
     # factors to sectors: nasa closes labour to the euro
     for name, secs in SECTORS.items():
@@ -308,9 +351,17 @@ def generate(country: str, year: int,
     add("hhd", "lab", n("D1", "S14_S15", "RECV"))
     add("lab", "row", n("D1", "S2", "PAID"))
     add("row", "lab", n("D1", "S2", "RECV"))
+    # Capital-account closure. cap receives gross operating surplus and mixed
+    # income from the supply-use tables (cap <- act); the sector accounts
+    # distribute B2A3G to the domestic sectors (cap -> sectors). The two
+    # sources measure the same aggregate differently, and the difference is
+    # booked against the rest of the world so the account closes. It is a
+    # measurement discrepancy between sources, not an observed flow, so it is
+    # recorded as a plug and stated in every report.
     cap_in = sam.get(("cap", "act"), 0.0)
     cap_out = sum(sam.get((name, "cap"), 0.0) for name in SECTORS)
-    add("row", "cap", cap_in - cap_out)                            # residual
+    plugs = {("row", "cap"): cap_in - cap_out}
+    add("row", "cap", cap_in - cap_out)
 
     # instrument accounts (N1)
     for acct, item in INSTRUMENTS.items():
@@ -331,6 +382,51 @@ def generate(country: str, year: int,
                             for s in secs))
     add("row", "si", n("B9", "S1", "PAID"))
 
+    # --- cross-source diagnostics (reported, never used to adjust) ---
+    def either(item, sector):
+        return n(item, sector, "PAID") or n(item, sector, "RECV")
+
+    sa_gva = n("P1", "S1", "RECV") - n("P2", "S1", "PAID")
+    sa_d1 = n("D1", "S1", "PAID")
+    sa_b2 = sum(n("B2A3G", s, "RECV") or n("B2A3G", s, "PAID")
+                for secs in SECTORS.values() for s in secs)
+    sa_p3 = n("P3", "S14_S15", "PAID")
+    sut_p3 = fd_tot["P3_S14"] + fd_tot["P3_S15"]
+    cross_source = {
+        "Gross value added at basic prices": (
+            va_tot["D1"] + va_tot["B2A3G"] + va_tot["D29X39"], sa_gva),
+        "Compensation of employees (D1), resident producers": (
+            va_tot["D1"], sa_d1),
+        "Gross operating surplus and mixed income (B2A3G)": (
+            va_tot["B2A3G"], sa_b2),
+        "Household final consumption (P3)": (sut_p3, sa_p3),
+    }
+    net_d9 = {name: sum(n("D9", s, "RECV") - n("D9", s, "PAID")
+                        for s in secs) for name, secs in SECTORS.items()}
+    residual_items = {
+        name: [("net capital transfers received (D9), routed through the "
+                "institution's account while si receives saving (B8G) "
+                "before capital transfers", net_d9[name])]
+        for name in SECTORS}
+    residual_items["gvt"].append((
+        "taxes on production and imports received, less subsidies paid, by "
+        "the rest of the world (S2, mainly EU institutions); the generator "
+        "credits all such taxes to domestic government",
+        n("D2", "S2", "RECV") - n("D3", "S2", "PAID")))
+    residual_items["hhd"].append((
+        "household consumption, sector accounts less supply-use tables",
+        sa_p3 - sut_p3))
+    residual_items["si"] = [(
+        "acquisitions less disposals of non-produced assets (NP), not "
+        "represented", either("NP", "S1"))]
+    residual_items["lab"] = [(
+        "compensation of employees, supply-use tables less sector accounts",
+        va_tot["D1"] - sa_d1)]
+    residual_items["row"] = [(
+        "closing entry (row,cap)", plugs[("row", "cap")])]
+    vintages = {"supply": sup.updated, "use": use.updated,
+                "sectors": nasa.updated}
+
     rowsum, colsum = {}, {}
     for (r, c), v in sam.items():
         rowsum[r] = rowsum.get(r, 0.0) + v
@@ -344,7 +440,9 @@ def generate(country: str, year: int,
                     for a in accounts},
         gdp=(sam.get(("lab", "act"), 0.0) + sam.get(("cap", "act"), 0.0)
              + sam.get(("atx", "act"), 0.0)),
-        coverage=coverage)
+        coverage=coverage, plugs=plugs, vintages=vintages,
+        cross_source=cross_source, residual_items=residual_items,
+        missing_inputs=sorted(f"{i} {sec}" for i, sec in absent - present))
     return res
 
 
@@ -390,22 +488,51 @@ def balance(res: MacroSAMResult, targets: str = "mean",
     return ras(seed, t, dict(t), max_iter=20000), flipped
 
 
-def write_balanced_csv(bal: BalanceResult, path: str | Path) -> None:
-    """Balanced matrix in long form, carrying the RAS adjustment factor
-    of every cell."""
+def write_balanced_csv(bal: BalanceResult, path: str | Path,
+                       decimals: int = 1,
+                       flipped: list[tuple[str, str]] | None = None,
+                       plugs: dict[tuple[str, str], float] | None = None,
+                       ) -> None:
+    """Balanced matrix with every cell's RAS factor.
+
+    Values are rounded to `decimals` places of EUR million (default 0.1m),
+    so the written matrix balances only to that rounding even though the
+    balanced matrix in memory closes to the solver's tolerance. Pass a
+    larger `decimals` for a higher-precision export. Long form, one row
+    per cell.
+
+    Pass `flipped` (from balance()) and `plugs` (res.plugs) to add a note
+    column marking cells that are not observed flows: closing entries, and
+    cells flipped from a negative before RAS. A flipped closing entry is
+    marked at its new position. Without them the format is unchanged."""
+    notes: dict[tuple[str, str], str] = {}
+    flips = set(flipped or [])
+    for (r, c) in plugs or {}:
+        pos = (c, r) if (r, c) in flips else (r, c)
+        notes[pos] = ("closing entry, flipped from "
+                      f"({r},{c})" if pos != (r, c) else "closing entry")
+    for (r, c) in flips:
+        notes.setdefault((c, r), f"flipped from ({r},{c})")
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["row", "col", "value_EURm", "ras_factor"])
+        head = ["row", "col", "value_EURm", "ras_factor"]
+        w.writerow(head + ["note"] if notes else head)
         for (r, c), v in sorted(bal.matrix.items()):
-            w.writerow([r, c, f"{v:.1f}", f"{bal.factors.get((r, c), 1.0):.6f}"])
+            row = [r, c, f"{v:.{decimals}f}",
+                   f"{bal.factors.get((r, c), 1.0):.6f}"]
+            w.writerow(row + [notes.get((r, c), "")] if notes else row)
 
 
 def write_report(res: MacroSAMResult, path: str | Path,
                  balance: BalanceResult | None = None,
-                 flipped: list[tuple[str, str]] | None = None) -> None:
+                 flipped: list[tuple[str, str]] | None = None,
+                 targets: str = "mean") -> None:
     """Generic markdown validation report for one generated macro SAM;
-    pass `balance` (and `flipped`) to append the balancing diagnostics."""
-    with open(path, "w", encoding="utf-8") as f:
+    pass `balance` (and `flipped`, and the `targets` rule given to
+    balance()) to append the balancing diagnostics."""
+    # newline="\n": the same bytes on every platform, so a report can be
+    # compared byte-for-byte across operating systems like the CSVs can.
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(f"# {res.country} {res.year}: benchmark-free macro-SAM "
                 f"generation\n\nGenerated by "
                 f"edikit.pipeline.eurostat_sam from the Eurostat "
@@ -414,8 +541,12 @@ def write_report(res: MacroSAMResult, path: str | Path,
                 f"- Industries: {len(res.inds)}; products: {len(res.prods)}\n"
                 f"- Output and VA identities: {len(res.findings)} findings "
                 f"at EUR 1m tolerance\n")
-        for x in res.findings[:12]:
+        for x in res.findings:
             f.write(f"  - {x}\n")
+        if res.missing_inputs:
+            f.write(f"- Sector-account values not published on either side "
+                    f"(used as zero; any account they feed is unreliable): "
+                    f"{', '.join(res.missing_inputs)}\n")
         f.write(f"- Supply-vs-use output cross-check: "
                 f"{len(res.cross_diffs)} industries differ (>EUR 1m)\n")
         f.write(f"- Import identity cross-check (TS_BP = domestic + imports): "
@@ -442,19 +573,71 @@ def write_report(res: MacroSAMResult, path: str | Path,
         for a in res.accounts:
             v = res.imbalances[a]
             f.write(f"| {a} | {v:+,.0f} | {v / res.gdp * 100:+.3f}% |\n")
-        f.write("\nResiduals are reported, not hidden; they typically attach "
-                "to ESA boundary items (domestic-vs-national concept in "
-                "compensation, mixed-income attribution, capital-account "
-                "detail). Inspect any account above a few percent of GDP "
-                "before use.\n")
+        if res.cross_source:
+            f.write("\n## Cross-source consistency\n\n"
+                    "The supply-use tables and the sector accounts measure "
+                    "some aggregates twice. Differences between them are "
+                    "properties of the inputs, not of the generator. "
+                    "Dataset vintages (\"updated\" stamps): "
+                    + "; ".join(f"{k} {v or 'not stated'}"
+                                for k, v in res.vintages.items())
+                    + ".\n\n| Aggregate | Supply-use tables | Sector "
+                    "accounts | Difference | % |\n|---|---|---|---|---|\n")
+            for name, (a, b) in res.cross_source.items():
+                pct = f"{(b - a) / a * 100:+.2f}%" if a else "-"
+                f.write(f"| {name} | {a:,.1f} | {b:,.1f} | {b - a:+,.1f} | "
+                        f"{pct} |\n")
+        if res.residual_items:
+            f.write("\n## Items bearing on each residual\n\n"
+                    "Each item is computed from the inputs. An item marked "
+                    "= matches the residual within EUR 1m; otherwise the "
+                    "items are shown with what they leave unexplained. This "
+                    "describes the residuals; it does not establish their "
+                    "causes.\n\n| Account | Residual | Item | Value |\n"
+                    "|---|---|---|---|\n")
+            for acc, items in res.residual_items.items():
+                r = res.imbalances.get(acc, 0.0)
+                for desc, v in items:
+                    mark = " =" if abs(r - v) <= 1.0 else ""
+                    f.write(f"| {acc} | {r:+,.1f} | {desc} | "
+                            f"{v:+,.1f}{mark} |\n")
+                if len(items) > 1:
+                    tot = sum(v for _, v in items)
+                    f.write(f"| {acc} | | sum of items (unexplained "
+                            f"{r - tot:+,.1f}) | {tot:+,.1f} |\n")
+                elif abs(r - items[0][1]) > 1.0:
+                    f.write(f"| {acc} | | unexplained | "
+                            f"{r - items[0][1]:+,.1f} |\n")
+        f.write("\nInspect any residual above a few percent of GDP before "
+                "using the matrix, starting with the items above.\n")
+        if res.plugs:
+            f.write("\n## Closing entries\n\n"
+                    "These cells are residuals that make an account close, "
+                    "not observed flows:\n\n")
+            for (r, c), v in sorted(res.plugs.items()):
+                f.write(f"- ({r},{c}) = EUR {v:+,.1f}m "
+                        f"({v / res.gdp * 100:+.3f}% of GDP)\n")
+            if ("row", "cap") in res.plugs:
+                f.write("- (row,cap) closes the capital factor account "
+                        "(cap): gross operating surplus and mixed income from "
+                        "the supply-use tables, less the amount the sector "
+                        "accounts distribute to domestic sectors. It measures "
+                        "the discrepancy between the two sources (see "
+                        "Cross-source consistency) and is booked against the "
+                        "rest of the world, so it also appears in the row "
+                        "residual. If negative, balancing flips it to "
+                        "(cap,row), where it reads as factor income from "
+                        "abroad; the balanced CSV's note column marks it.\n")
         if balance is not None:
             f.write("\n## Balanced macro SAM\n\n")
             if flipped:
                 f.write("- Negative cells flipped to their positive "
                         "transpose before balancing: "
                         + ", ".join(f"({r},{c})" for r, c in flipped) + "\n")
-            f.write(f"- RAS against account targets = mean(receipts, "
-                    f"payments): converged={balance.converged} in "
+            rule = {"mean": "mean(receipts, payments)",
+                    "receipts": "receipts", "payments": "payments"}[targets]
+            f.write(f"- RAS against account targets = {rule}: "
+                    f"converged={balance.converged} in "
                     f"{balance.iterations} iterations; max residual EUR "
                     f"{max(balance.max_row_gap, balance.max_col_gap):.3f}m\n")
             fs = sorted(balance.factors.values())
@@ -462,11 +645,21 @@ def write_report(res: MacroSAMResult, path: str | Path,
                     f"[{fs[0]:.4f}, {fs[-1]:.4f}] (max |f-1| = "
                     f"{balance.max_factor_deviation() * 100:.2f}%); every "
                     f"factor ships in the balanced CSV\n")
+            m = balance.matrix
+            gdp_bal = (m.get(("lab", "act"), 0.0) + m.get(("cap", "act"), 0.0)
+                       + m.get(("atx", "act"), 0.0))
+            f.write(f"- GDP at basic prices after balancing: EUR "
+                    f"{gdp_bal:,.1f}m ({(gdp_bal / res.gdp - 1) * 100:+.3f}% "
+                    f"vs. generated); balancing moves aggregates, so use the "
+                    f"balanced matrix only where that shift is acceptable\n")
 
 
-def write_csv(res: MacroSAMResult, path: str | Path) -> None:
+def write_csv(res: MacroSAMResult, path: str | Path,
+              decimals: int = 1) -> None:
+    """Generated (unbalanced) matrix, values rounded to `decimals` places
+    of EUR million (default 0.1m)."""
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["row", "col", "value_EURm"])
         for (r, c), v in sorted(res.sam.items()):
-            w.writerow([r, c, f"{v:.1f}"])
+            w.writerow([r, c, f"{v:.{decimals}f}"])

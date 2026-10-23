@@ -1,0 +1,36 @@
+# SHA-256 manifest of P001 inputs, sha256sum format (paths relative to this file).
+# Verify with:  shasum -a 256 -c SOURCES.sha256   or   edikit.data.provenance.verify_sources
+# raw/ is committed and published. external/ is NOT redistributable (see SOURCES.md for
+# publisher, access route and licence): obtain each file yourself, then verify it here.
+# To check only what a clean clone holds:  verify_sources(m, only=[...raw paths...])
+
+59ef7712d66d5624dcf6b4290d4767bd1198b0c7a6213be2c6d4dc39c7c0b8d4  raw/kenya/ifpri/001_readme.txt
+a949a1e6afd185cd253cb7589c5885e94361cfc9982edf5177cf206d32b08cc3  raw/kenya/ifpri/002_IFPRI_SAM_KEN_2019_SAM.csv
+16ce48f925a4c3c82090bc27a2769c68cfc01c81ce692bcc3b6311bb0b9ec373  raw/kenya/ifpri/003_IFPRI_SAM_KEN_2019_POP.csv
+4040310ef9b8161c67d9a11a4c03ddd070ad442edb002f87a403a21af21f6091  raw/kenya/kenya_sam_datapaper.pdf
+6dfb8d937b0869f89ea96c1fe0155e52460aa6c2d31deaaeff4147be2ddc01cb  raw/kenya/kenya_sam_datapaper.txt
+70e38894a8231018b0f97bd2bab607891e8ff9eb4e09edbd8766c31c236aa86f  raw/kenya/knbs/2019-Economic-Survey.pdf
+aa52bbb898506ab188033b52343c0d6edfc086831af858c82eab00d2873f8a2b  raw/kenya/knbs/2020-Economic-Survey.pdf
+3796c6741f41abde6510915d9c978062add3dd3633f2ce925364d809b0e4c52b  raw/kenya/knbs/KNBS_2009_Supply_and_Use_Tables_Economic_Survey_2014.pdf
+e12fe00509a52a8f931a0dfc0dc4a49b8e1f227de65f727d861bf394ef1a2f21  raw/kenya/knbs/Kenya_KNBS_2009_Supply_and_Use_Tables_2014_extract.pdf
+734d1b25277abc8728570887d9dfd35e050643d7f1064f9063f1310a92ed6c2b  raw/kenya/knbs/Revision-and-Rebasing-of-National-Accounts-Report.pdf
+f857752a06e8bf09ba4a9501a3b129a6ca1efa83005d325de1d38db9cba33083  raw/kenya/knbs/Sources-and-Methods-for-the-Revised-and-Rebased-National-Accounts.pdf
+cefd02794843d898f85b2e87c492d7798f62b7fea91a9f84f9ffbb2c7340ba1f  raw/netherlands/naio_10_cp15_NL_2019.json
+f0bdbb317792fd7da61a6141bc523e52287063acd4a061ed6a3b1c429b58810a  raw/netherlands/naio_10_cp16_NL_2019.json
+aaa52b563491bb3606e58a9a6b8de36b8589499010218d5d013482c537dbbafc  raw/netherlands/nasa_10_nf_tr_NL_2019.json
+9cc9362c4b515440ade400dfb2fa391fc2ebeb0ab1dfdc01697549071b29275c  raw/sarb/03Kbp4 Public Finance December 2022.zip
+63c2446909ad172e4f4cabee3dca6ebc01fb94bca562a7080fc97157a28090b4  raw/sarb/04KBP5 Balance of Payments December 2022.zip
+776e2d195a01f41be07b5606bac40dbf6da720f40911a653b35c85e58be60a22  raw/sarb/05KBP6 National Accounts December 2022.zip
+770872d91fc7f302878ab3fcd62101dc6e211a43d83c9549559e8158153b2a1d  raw/statssa/P00212019.pdf
+4163785fa0ff1c27d82562b7d100a89804513fc3fb4dc4b6987e6fa59208791c  raw/statssa/Report-04-04-032019.pdf
+3cc319842ec7da64db3c90d9d92b540616afab2a5db08b822f3ea96a580a576b  raw/statssa/Supply and use tables 2018 - 2019.xlsx
+3a538fef08712cf5e48406dd81906614e70fcca82ee6398a046dca41e6ff1f0c  raw/statssa/afs/AFS 2019 ~ Time series estimates.zip
+c7d1033a2d9783420a450831c3a22cab5126fb8a0d2c7441cabf93cfd924c9f5  raw/statssa/afs/Disaggregated industry estimates 2018_2019.zip
+4be9ad194a574356e71ee50005cb821b85604b3af6a7a1a60080e782008a054a  raw/statssa/afs/Disaggregated industry estimates 2019_2020.zip
+12563c914160b12bd5544d2906b349adc30654514485e6065c0664b467030834  raw/statssa/afs/Estimates by business size 2018_2019.zip
+9de5ade4208cd36103edbbf36bc649dcff4b3a1b92095ff980527116ac500cf9  external/lcs-2014-2015-v1-csv.zip
+c18e20d149fd13c73b9ec21f2152a38d359d7940fdad213fb1755b964c664ee2  external/lmdsa-2018-v1.0-csv.zip
+2df63362bdc34f9997faf422ed7a2a9c2131358151209480d65b2b865af342e0  external/lmdsa-2019-v1.1.zip
+8a79715cc9d39194fc55afa8e7968f1f36d071a88bc4a067e033d5f7e17cc144  external/tn2023-1-2019-SASAM-for-distribution.xlsx
+515f98108a8951d02f9808903e319e7fee5e44f67b9b71839392e9c7966b2d99  external/tn2023-1-2019-SASAM-for-distribution.zip
+07be2dfea79f3431e16548c398dcd96f83444fc8862c44a2d6ede5f3586b792a  external/tn2023-1.pdf

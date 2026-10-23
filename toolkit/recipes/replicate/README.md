@@ -1,10 +1,13 @@
 # Replicate recipe
 
-Regenerate every number in the P001 working paper from the registered
-sources. The replication package is `papers/P001-sut-to-sam/`:
+Reproduce the numbers in the companion paper (P001) from the registered
+sources. Several inputs cannot be redistributed, and each user obtains them
+from the publisher and verifies them against the manifest. The replication
+package is `papers/P001-sut-to-sam/`:
 
-- `data/SOURCES.md` — the source registry (publisher, vintage, URL,
-  SHA-256 for every input). Public raw files are committed under
+- `data/SOURCES.md` is the source registry: publisher, vintage, URL and
+  license. `data/SOURCES.sha256` gives the SHA-256 of every input, checkable
+  with `shasum -a 256 -c` or `edikit.data.provenance.verify_sources`. Public raw files are committed under
   `data/raw/`; access-restricted microdata (DataFirst) and
   redistribution-unclear files are registered by URL + hash and live in
   git-ignored `data/external/` — fetch them per the registry before
@@ -35,10 +38,15 @@ docstring). Every script writes a validation report to `outputs/` — the
 reports, not the console, are the record.
 
 Most scripts need inputs that cannot be redistributed here. From a clean
-clone, with no fetched data, three run to completion (12, 14, 15) and the
-rest stop on a registered source: nine on the UNU-WIDER benchmark and one
-(script 10) on the SARB series values, whose codes are listed in
-`data/derived/sarb_kbp_series.csv` but whose observations come from the
-Quarterly Bulletin files registered as S-004. That is expected behaviour,
-not breakage; `data/raw/NOT-REDISTRIBUTED.md` states where each fetched
-file belongs.
+clone with no fetched data, three scripts run to completion: 12, 14 and 15.
+The rest stop on a registered source:
+- eight on the UNU-WIDER benchmark SAM (01 to 06, 09 and 11);
+- script 08 on the text of that benchmark's technical note;
+- script 10 on the Living Conditions Survey microdata.
+
+Scripts 07 and 13 also need the `replicate` extra. This is expected, not
+breakage: `papers/P001-sut-to-sam/data/raw/NOT-REDISTRIBUTED.md` in the
+public repository states where each fetched file belongs. Scripts 07, 08
+and 13 read the technical note's text, `external/tn2023-1.txt`, which you
+extract from the registered PDF (`external/tn2023-1.pdf`); the PDF has a
+digest in `SOURCES.sha256`, the extracted text does not.

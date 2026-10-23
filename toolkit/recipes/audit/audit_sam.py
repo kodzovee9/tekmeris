@@ -17,7 +17,6 @@ worked example against the IFPRI 2019 Nexus SAM.
 """
 
 import argparse
-import csv
 import sys
 from pathlib import Path
 
@@ -34,6 +33,9 @@ def main() -> None:
     ap.add_argument("--kinds", help="account,kind CSV for macro aggregates")
     ap.add_argument("--controls", help="aggregate,value CSV of published "
                                        "national-accounts controls")
+    ap.add_argument("--strict", action="store_true",
+                    help="stop on unclassified or phantom accounts instead "
+                         "of warning and excluding them from aggregates")
     ap.add_argument("--out", default="audit.md")
     ap.add_argument("--title", default="SAM structural audit")
     args = ap.parse_args()
@@ -41,14 +43,10 @@ def main() -> None:
     cells = (A.read_long_csv(args.sam) if args.format == "long"
              else A.read_matrix_csv(args.sam, code_col=args.code_col))
     kinds = A.read_kinds(args.kinds) if args.kinds else None
-    controls = None
-    if args.controls:
-        with open(args.controls, encoding="utf-8-sig") as f:
-            recs = list(csv.DictReader(f))
-        keys = list(recs[0])
-        controls = {r[keys[0]].strip(): float(r[keys[1]]) for r in recs}
+    controls = A.read_controls(args.controls) if args.controls else None
 
-    res = A.audit(cells, kinds=kinds, controls=controls)
+    res = A.audit(cells, kinds=kinds, controls=controls,
+                  strict=args.strict)
     A.write_report(res, args.out, title=args.title)
 
     a, g = res.max_gap

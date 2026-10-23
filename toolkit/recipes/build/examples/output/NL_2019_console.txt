@@ -1,0 +1,11 @@
+fetching NL 2019 (cached files reused)...
+industries 65; products 65; identity findings 0; commodity closure 65/65
+macro SAM: 18 accounts, GDP(bp) EUR 724,960m
+  row        -10,830  (-1.49% GDP)
+  hhd         +9,111  (+1.26% GDP)
+  lab         -4,193  (-0.58% GDP)
+  si          +2,937  (+0.41% GDP)
+  corp        +1,532  (+0.21% GDP)
+  gvt         +1,443  (+0.20% GDP)
+balanced: converged=True; max |factor-1| 2.82%; flipped [('row', 'cap'), ('row', 'd8')]
+written: examples/output/NL_2019_macro_sam.csv, examples/output/NL_2019_generation.md

@@ -1,0 +1,11 @@
+fetching FR 2019 (cached files reused)...
+industries 65; products 65; identity findings 0; commodity closure 65/65
+macro SAM: 18 accounts, GDP(bp) EUR 2,169,269m
+  row        +44,927  (+2.07% GDP)
+  si         -32,907  (-1.52% GDP)
+  gvt        -32,587  (-1.50% GDP)
+  corp       +22,623  (+1.04% GDP)
+  hhd         -1,887  (-0.09% GDP)
+  lab           -170  (-0.01% GDP)
+balanced: converged=True; max |factor-1| 31.95%
+written: examples/output/FR_2019_macro_sam.csv, examples/output/FR_2019_generation.md

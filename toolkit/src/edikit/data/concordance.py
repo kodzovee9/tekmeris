@@ -58,6 +58,12 @@ class Concordance:
         labels: dict[str, str] = {}
         with open(path, newline="") as f:
             for row in csv.DictReader(f):
+                if row["source"] in mapping:
+                    raise ValueError(
+                        f"{path}: source code {row['source']!r} is mapped "
+                        f"more than once ({mapping[row['source']]!r} and "
+                        f"{row['target']!r}); a concordance maps each source "
+                        f"to exactly one target")
                 mapping[row["source"]] = row["target"]
                 if row.get("target_label"):
                     labels[row["target"]] = row["target_label"]

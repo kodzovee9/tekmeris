@@ -56,7 +56,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Access | Online statistical query at resbank.co.za (browser; free). The public web API endpoint responds but returned empty for KBP codes from this environment — verify interactively. |
 | Required series | **69 annual series**, enumerated with descriptions in `derived/sarb_kbp_series.csv`, extracted from S-003's technical note, which maps every institutional macro-SAM cell to explicit KBP formulas |
 | Use in P001 | Macro controls for the entire institutional block: factor income allocation, property income, transfers, direct taxes, savings, rest-of-world |
-| Files | `raw/sarb/05KBP6 National Accounts December 2022.zip` (SHA-256 `776e2d19…8be60a22`), `raw/sarb/03Kbp4 Public Finance December 2022.zip` (`9cc9362c…b29275c`), `raw/sarb/04KBP5 Balance of Payments December 2022.zip` (`63c24469…a28090b4`) — bulk Quarterly Bulletin data files, December 2022 issue, downloaded 2026-07-16 via browser (the online statistical query backend currently returns empty for all KBP series; diagnosed and documented) |
+| Files | `raw/sarb/05KBP6 National Accounts December 2022.zip` (SHA-256 `776e2d195a01f41be07b5606bac40dbf6da720f40911a653b35c85e58be60a22`), `raw/sarb/03Kbp4 Public Finance December 2022.zip` (`9cc9362c4b515440ade400dfb2fa391fc2ebeb0ab1dfdc01697549071b29275c`), `raw/sarb/04KBP5 Balance of Payments December 2022.zip` (`63c2446909ad172e4f4cabee3dca6ebc01fb94bca562a7080fc97157a28090b4`) — bulk Quarterly Bulletin data files, December 2022 issue, downloaded 2026-07-16 via browser (the online statistical query backend currently returns empty for all KBP series; diagnosed and documented) |
 | Coverage check | All 69 required codes present in the annual (J1) sheets with 2019 values. Vintage verified: KBP6007J (household consumption) = R3,588,896m and KBP6014J (imports) = R1,502,065m equal the benchmark SAM's corresponding cells exactly — this is the "SARB 2022" vintage the technical note cites. |
 | Status | Obtained |
 
@@ -67,7 +67,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Publisher | Statistics South Africa (reports P0211-based; microdata via DataFirst, UCT) |
 | Use in P001 | Disaggregation of wage earnings by industry x occupation (10 occupations) |
 | Access | Microdata via DataFirst (founder registered 2026-07-16) |
-| Files | `external/lmdsa-2018-v1.0-csv.zip` (LMD 2018 v1.0 CSV, SHA-256 `c18e20d1…c664ee2`) and `external/lmdsa-2019-v1.1.zip` (LMD 2019 v1.1, SHA-256 `2df63362…5af342e0`, 168 MB CSV inside) — both git-ignored: DataFirst terms prohibit redistribution; replication package ships scripts + aggregated shares only |
+| Files | `external/lmdsa-2018-v1.0-csv.zip` (LMD 2018 v1.0 CSV, SHA-256 `c18e20d149fd13c73b9ec21f2152a38d359d7940fdad213fb1755b964c664ee2`) and `external/lmdsa-2019-v1.1.zip` (LMD 2019 v1.1, SHA-256 `2df63362bdc34f9997faf422ed7a2a9c2131358151209480d65b2b865af342e0`, 168 MB CSV inside) — both git-ignored: DataFirst terms prohibit redistribution; replication package ships scripts + aggregated shares only |
 | Status | Both years obtained — **S-005 complete. Data audit closed: every source family used by the benchmark is in hand.** |
 
 ## S-006 — Stats SA Living Conditions Survey 2014/15 (P0310) — OBTAINED
@@ -88,7 +88,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Use in P001 | Disaggregation of gross operating surplus into six capital-stock types (the accounts with suspect code/description alignment in the SAM: immo, mach, nitc, trnp, inta, land) |
 | Access | Public report + data files on statssa.gov.za |
 | Files | `raw/statssa/P00212019.pdf` (report); `raw/statssa/afs/` — three data zips (2026-07-16): Disaggregated industry estimates 2018–2019 (contains the **PPE schedules**: carrying values, additions, disposals by asset type x SIC industry — the capital-stock source behind the SAM's six capital accounts), Time series estimates, and Estimates by business size |
-| Status | Fully obtained. Addendum 2026-07-16: `raw/statssa/afs/Disaggregated industry estimates 2019_2020.zip` (SHA-256 `4be9ad19…08a054a`) added — contains **AFS 2019 revised**, identified numerically as the vintage behind the benchmark's capital split (median share deviation 0.18pp vs 0.72pp for the 2019 preliminary edition). |
+| Status | Fully obtained. Addendum 2026-07-16: `raw/statssa/afs/Disaggregated industry estimates 2019_2020.zip` (SHA-256 `4be9ad194a574356e71ee50005cb821b85604b3af6a7a1a60080e782008a054a`) added — contains **AFS 2019 revised**, identified numerically as the vintage behind the benchmark's capital split (median share deviation 0.18pp vs 0.72pp for the 2019 preliminary edition). |
 
 ## S-003 documentation — technical note (OBTAINED)
 
@@ -104,9 +104,9 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Field | Value |
 | --- | --- |
 | Publisher | IFPRI (Nexus Project); Thurlow (2021) |
-| Data | Harvard Dataverse doi:10.7910/DVN/ALUXSI — obtained 2026-07-17: `raw/kenya/ifpri/` (readme; SAM CSV, SHA-256 `a949a1e6…b08cc3`; population). Structural audit passed: 108 accounts in 11 label-groups matching the data paper; **all 2,086 published values are integers (Sh billions)** — the distributed matrix is a rounded presentation, so its own balance holds only to rounding (max gap Sh 5bn ≈ 0.06% of GDP), a fact for the replicability-profile section |
+| Data | Harvard Dataverse doi:10.7910/DVN/ALUXSI — obtained 2026-07-17: `raw/kenya/ifpri/` (readme; SAM CSV, SHA-256 `a949a1e6afd185cd253cb7589c5885e94361cfc9982edf5177cf206d32b08cc3`; population). Structural audit passed: 108 accounts in 11 label-groups matching the data paper; **all 2,086 published values are integers (Sh billions)** — the distributed matrix is a rounded presentation, so its own balance holds only to rounding (max gap Sh 5bn ≈ 0.06% of GDP), a fact for the replicability-profile section |
 | License | CC-BY-4.0 (redistributable, unlike S-003) |
-| Documentation | Data paper obtained: `raw/kenya/kenya_sam_datapaper.pdf` (33 pp., SHA-256 `see commit`), CC-BY |
+| Documentation | Data paper obtained: `raw/kenya/kenya_sam_datapaper.pdf` (33 pp., SHA-256 `4040310ef9b8161c67d9a11a4c03ddd070ad442edb002f87a403a21af21f6091`), CC-BY |
 | Method note | Nexus SAMs are **cross-entropy reconciled** (Robinson et al. 2001): exact cell-level replication is not expected by construction; the Kenya application audits macro-control replication and documents CE as a distinct replicability profile |
 | Sources per Table 9 | 2009 SUT (KNBS 2014); 2009-rebased GDP series + Economic Survey 2020 tables (KNBS 2020); government finance (Economic Survey 2019); IMF BPM6 BoP; World Bank WDI; FAOSTAT; COMTRADE; UNCTAD TRAINS; KIHBS 2015/16 |
 
@@ -114,7 +114,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 
 **Corrected 2026-07-17** (initial conclusion "not publicly distributed" was too strong; condensed publication located with external search assistance). The 2009 SUT, produced during the 2014 GDP rebasing, has a three-tier public record, all in `raw/kenya/knbs/`:
 
-1. **Condensed SUT published in print**: Economic Survey 2014, chapter 17 (pp. 266–279), Tables 17.8 (supply) and 17.9 (use) at broad product-group level; full ES 2014 (322 pp., SHA-256 `6d…` per commit) and a 14-page chapter extract (SHA-256 `e12fe005…b394`). Text-extractable; provides public supply-side control totals (output, imports, margins, product taxes by product group).
+1. **Condensed SUT published in print**: Economic Survey 2014, chapter 17 (pp. 266–279), Tables 17.8 (supply) and 17.9 (use) at broad product-group level; full ES 2014 (322 pp., SHA-256 `3796c6741f41abde6510915d9c978062add3dd3633f2ce925364d809b0e4c52b`) and a 14-page chapter extract (SHA-256 `e12fe00509a52a8f931a0dfc0dc4a49b8e1f227de65f727d861bf394ef1a2f21`). Text-extractable; provides public supply-side control totals (output, imports, margins, product taxes by product group).
 2. **Methodology**: the two rebasing reports (Revision & Rebasing; Sources & Methods — the latter states the revision classified 86 industries and 153 products).
 3. **The detailed balanced SUT (151 products × 81 industries) is compiled but not distributed** — ES 2014 ¶17.22 verbatim: "A detailed balanced SUT consisting of 151 products by 81 industries has been compiled and the results are available at KNBS."
 
@@ -122,7 +122,7 @@ Replicability finding, refined: Kenya's SUT is public only at condensed level; t
 
 ## S-010 — KNBS Economic Survey 2020 + 2019 — OBTAINED
 
-`raw/kenya/knbs/2020-Economic-Survey.pdf` (SHA-256 `aa52bbb8…873a8a2b`) and `2019-Economic-Survey.pdf`, obtained 2026-07-17. Rebased GDP series (Tables 2.1–2.7, 2.12a), sector detail (7.17, 8.8, 10.3), government accounts (5.3–5.4). Used in `code/14_kenya_audit.py` stage 2: 2019 current-price controls transcribed from Table 2.1 (p. 26: GVA, taxes on products, GDP mp) and Table 2.7 (p. 33: expenditure components and the KSh −352bn production-vs-expenditure discrepancy).
+`raw/kenya/knbs/2020-Economic-Survey.pdf` (SHA-256 `aa52bbb898506ab188033b52343c0d6edfc086831af858c82eab00d2873f8a2b`) and `2019-Economic-Survey.pdf` (SHA-256 `70e38894a8231018b0f97bd2bab607891e8ff9eb4e09edbd8766c31c236aa86f`), obtained 2026-07-17. Rebased GDP series (Tables 2.1–2.7, 2.12a), sector detail (7.17, 8.8, 10.3), government accounts (5.3–5.4). Used in `code/14_kenya_audit.py` stage 2: 2019 current-price controls transcribed from Table 2.1 (p. 26: GVA, taxes on products, GDP mp) and Table 2.7 (p. 33: expenditure components and the KSh −352bn production-vs-expenditure discrepancy).
 
 ## Third application: Netherlands (paper v3)
 
@@ -139,6 +139,6 @@ Replicability finding, refined: Kenya's SUT is public only at condensed level; t
 
 ## Folder policy
 
-- `raw/` — committed to the repository (currently private): official public statistics, unmodified.
+- `raw/` — committed to the repository and published with it: official public statistics, unmodified.
 - `external/` — **not** committed (`.gitignore`): third-party files with unconfirmed redistribution rights; registered here by URL + hash instead.
 - Before this repository is ever made public, re-check every license above; anything unclear moves to `external/`.

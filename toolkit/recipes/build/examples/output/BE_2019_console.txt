@@ -1,0 +1,11 @@
+fetching BE 2019 (cached files reused)...
+industries 65; products 65; identity findings 0; commodity closure 65/65
+macro SAM: 18 accounts, GDP(bp) EUR 427,315m
+  corp        +3,104  (+0.73% GDP)
+  row         -2,796  (-0.65% GDP)
+  si          -2,210  (-0.52% GDP)
+  gvt         +1,777  (+0.42% GDP)
+  hhd           +510  (+0.12% GDP)
+  lab           -384  (-0.09% GDP)
+balanced: converged=True; max |factor-1| 8.49%; flipped [('atx', 'act'), ('gvt', 'atx'), ('row', 'cap'), ('d9', 'corp')]
+written: examples/output/BE_2019_macro_sam.csv, examples/output/BE_2019_generation.md
