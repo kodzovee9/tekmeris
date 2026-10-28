@@ -83,9 +83,8 @@ not be sold.
 
 If you use the toolkit or the results, please cite the working paper
 (citation file: [`CITATION.cff`](CITATION.cff)). A software metapaper
-for `edikit` is drafted at
-[`papers/S001-edikit/`](papers/S001-edikit/) (submission in
-preparation).
+for `edikit` is under review at the *Journal of Open Research Software*;
+its manuscript is in [`papers/S001-edikit/`](papers/S001-edikit/).
 
 ## License
 
