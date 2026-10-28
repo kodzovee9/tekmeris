@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "edikit"
-version = "0.2.6"
+version = "0.2.7"
 description = "Reproducible construction and auditing of social accounting matrices from official statistics"
 readme = "README.md"
 license = "Apache-2.0"
@@ -50,7 +50,7 @@ replicate = ["xlrd", "matplotlib"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/edikit"]
 
-# The published test suite is every test that runs (78 in v0.2.6). The P002 Senegal
+# The published test suite is every test that runs (78 in v0.2.7). The P002 Senegal
 # integration test needs the JRC matrix, which is held with that
 # unreleased paper and is absent from the public repository (see the
 # matching exclusion in scripts/sync-public.sh). Shipping it in the sdist

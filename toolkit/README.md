@@ -16,12 +16,6 @@ exist only when a paper needed them — nothing is built speculatively.
 Which conditions stop execution and which are recorded is set out in the
 edikit metapaper (Table 1).
 
-## Roadmap stubs (empty packages, not yet implemented)
-
-`edikit.forecast` (vintage logging, later P006), `edikit.benchmark`
-(P002 — rankings with uncertainty bands), `edikit.decide` (P005+ —
-scenario comparison). They gain content only when a paper needs them.
-
 ## Recipes
 
 `recipes/` holds the three user-facing entry points, one per use case,
