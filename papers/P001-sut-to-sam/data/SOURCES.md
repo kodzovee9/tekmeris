@@ -15,7 +15,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | File | `raw/statssa/Supply and use tables 2018 - 2019.xlsx` (457 KB) |
 | SHA-256 | `3cc319842ec7da64db3c90d9d92b540616afab2a5db08b822f3ea96a580a576b` |
 | Contents | 6 sheets: Industry List, Product List, Supply Table 2018, Use Table 2018, Supply Table 2019, Use Table 2019 |
-| License | Stats SA publications are publicly released statistics; reproduction customarily permitted with attribution — **verify exact copyright terms before public redistribution** |
+| License | Stats SA's terms, printed on the copyright page of its SUT report (S-002, Report No. 04-04-03): users may apply or process the data provided Stats SA is acknowledged as the original source and the analysis is stated to be the user's independent processing; neither the data nor any reprocessed version may be sold without Stats SA's permission. The files are redistributed unmodified, free of charge, with attribution. Checked 2026-10-28. |
 | Use in P001 | Primary input: the official SUT core from which the SAM is constructed |
 | Known limitations | 2019 tables are preliminary; Stats SA may have published revisions since. Must verify vintage matches the one used by the benchmark SAM (see S-003) by comparing control totals. |
 
@@ -28,6 +28,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Access date | 2026-07-16 |
 | File | `raw/statssa/Report-04-04-032019.pdf` (1.0 MB) |
 | SHA-256 | `4163785fa0ff1c27d82562b7d100a89804513fc3fb4dc4b6987e6fa59208791c` |
+| License | Stats SA's terms, as quoted under S-001 (this report is where they are printed) |
 | Use in P001 | Methodological documentation: valuation bases, margins, classifications |
 
 ## S-003 — UNU-WIDER 2019 South Africa SAM (benchmark) — OBTAINED
@@ -87,6 +88,7 @@ Every raw file is recorded here with its provenance and SHA-256 hash before any 
 | Publisher | Statistics South Africa |
 | Use in P001 | Disaggregation of gross operating surplus into six capital-stock types (the accounts with suspect code/description alignment in the SAM: immo, mach, nitc, trnp, inta, land) |
 | Access | Public report + data files on statssa.gov.za |
+| License | Stats SA's terms, as quoted under S-001 |
 | Files | `raw/statssa/P00212019.pdf` (report); `raw/statssa/afs/` — three data zips (2026-07-16): Disaggregated industry estimates 2018–2019 (contains the **PPE schedules**: carrying values, additions, disposals by asset type x SIC industry — the capital-stock source behind the SAM's six capital accounts), Time series estimates, and Estimates by business size |
 | Status | Fully obtained. Addendum 2026-07-16: `raw/statssa/afs/Disaggregated industry estimates 2019_2020.zip` (SHA-256 `4be9ad194a574356e71ee50005cb821b85604b3af6a7a1a60080e782008a054a`) added — contains **AFS 2019 revised**, identified numerically as the vintage behind the benchmark's capital split (median share deviation 0.18pp vs 0.72pp for the 2019 preliminary edition). |
 
@@ -139,6 +141,6 @@ Replicability finding, refined: Kenya's SUT is public only at condensed level; t
 
 ## Folder policy
 
-- `raw/` — committed to the repository and published with it: official public statistics, unmodified.
+- `raw/` — committed to this repository: official public statistics, unmodified. Not all of them are published (see the last item).
 - `external/` — **not** committed (`.gitignore`): third-party files with unconfirmed redistribution rights; registered here by URL + hash instead.
-- Before this repository is ever made public, re-check every license above; anything unclear moves to `external/`.
+- Public repository (`kodzovee9/tekmeris`): it carries only the `raw/` files whose terms permit redistribution, namely Stats SA (terms quoted under S-001), the IFPRI Kenya SAM files (CC BY 4.0), and the Eurostat responses (reuse with attribution). The SARB and KNBS files sit in `raw/` here but are not published; the public `raw/NOT-REDISTRIBUTED.md` says how to obtain them. The UNU-WIDER and DataFirst files stay in `external/`. License check done 2026-10-28.
